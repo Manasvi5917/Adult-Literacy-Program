@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adult Literacy Program </title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- CREATE ACCOUNT PAGE -->
+<section id="signupPage" class="login-page ">
+
+    <div class="login-card">
+
+        <h1>Create Your Account</h1>
+
+        <p class="login-subtitle">
+            Adult Literacy Program
+        </p>
+
+        <p class="login-description">
+            Register to manage learners and track their progress.
+        </p>
+
+        <form id="signupForm">
+
+            <label for="signupName">Full Name</label>
+            <input
+                type="text"
+                id="signupName"
+                placeholder="Enter your full name"
+                required
+            >
+
+            <label for="signupEmail">Email Address</label>
+            <input
+                type="email"
+                id="signupEmail"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label for="signupUsername">Username</label>
+            <input
+                type="text"
+                id="signupUsername"
+                placeholder="Create a username"
+                required
+            >
+
+            <label for="signupPassword">Password</label>
+            <input
+                type="password"
+                id="signupPassword"
+                placeholder="Create a password"
+                minlength="6"
+                required
+            >
+
+            <label for="confirmPassword">Confirm Password</label>
+            <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Re-enter your password"
+                minlength="6"
+                required
+            >
+            <label for="accountRole">Select Your Role</label>
+<select id="accountRole" required>
+    <option value="">Choose your role</option>
+    <option value="learner">Learner</option>
+    <option value="teacher">Teacher</option>
+    <option value="volunteer">Volunteer</option>
+</select>
+
+            <button type="submit" class="login-button">
+                Create Account →
+            </button>
+
+            <p id="signupMessage"></p>
+
+        </form>
+
+        <p class="login-footer">
+            Already have an account?
+            <button type="button" id="showLoginButton" class="switch-button">
+                Login
+            </button>
+        </p>
+
+    </div>
+
+</section>
+<!-- LOGIN PAGE -->
+<section id="loginPage" class="login-page hidden">
+    <div class="login-card">
+       
+
+        <h1>Adult Literacy Program</h1>
+        <p class="login-subtitle">
+            Registration &amp; Progress Tracker
+        </p>
+
+        <h2>Welcome Back!</h2>
+        <p class="login-description">
+            Sign in to manage your learning community.
+        </p>
+
+        <form id="loginForm">
+            <label for="username">Username</label>
+            <input type="text" id="username"
+                   placeholder="Enter username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password"
+                   placeholder="Enter password" required>
+
+            <button type="submit" class="login-button">
+                Login →
+            </button>
+
+            <p id="loginMessage"></p>
+        </form>
+
+        <p class="login-footer">
+    Don't have an account?
+    <button type="button" id="showSignupButton" class="switch-button">
+        Create Account
+    </button>
+        </p>
+    </div>
+</section>
+
+
+<!-- DASHBOARD PAGE -->
+<div id="dashboardPage" class="app hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">L</div>
+            <div>
+                <h2>Literacy</h2>
+                <span>CONNECT</span>
+            </div>
+        </div>
+
+        <p class="menu-label">WORKSPACE</p>
+
+        <a href="#overview" class="nav-link active">⌂ Overview</a>
+        <a href="#registration" class="nav-link">＋ Register Learner</a>
+    <a href="#learningProgress" class="nav-link">↗ Learning Progress</a>
+    <a href="#smartAssistant" class="nav-link">
+    🧠 Smart Learning Assistant
+</a>
+<a href="#learnerProfile" class="nav-link">
+    👤 Learner Profile
+</a>
+<a href="#achievements" class="nav-link">
+    🏆 Achievements & Certificates
+</a>
+        <a href="#attendance" class="nav-link">▦ Attendance</a>
+        <a href="#progress" class="nav-link">↗ Learning Journey</a>
+
+        <div class="sidebar-bottom">
+            <div class="help-card">
+                <span>💡</span>
+                <h3>Small steps matter.</h3>
+                <p>Every lesson creates a new opportunity.</p>
+            </div>
+
+            <button id="logoutButton" class="logout">
+                ↪ Logout
+            </button>
+        </div>
+    </aside>
+
+
+    <!-- Main Dashboard -->
+    <main class="main" id="overview">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">ADULT EDUCATION MANAGEMENT</p>
+                <h1>Your learning community.</h1>
+                <p class="muted">
+                    A little progress each day adds up to big results.
+                </p>
+            </div>
+
+            <div class="profile">
+                <div class="avatar">A</div>
+                <div>
+                    <strong>Administrator</strong>
+                    <p>Program Coordinator</p>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- Welcome Banner -->
+        <section class="hero">
+            <div class="hero-content">
+                <span class="badge">✦ MAKING A DIFFERENCE</span>
+
+                <h2>Education has<br>
+                    <span>no age limit.</span>
+                </h2>
+
+                <p>
+                    Help every adult learner take another step
+                    toward reading, writing, and a brighter future.
+                </p>
+
+                <button class="primary-btn" id="registerButton">
+                    + Register a Learner
+                </button>
+            </div>
+
+            <div class="hero-art">
+                <div class="book-circle">📚</div>
+                <div class="floating-note note-one">✦ Learn</div>
+                <div class="floating-note note-two">✎ Grow</div>
+                <div class="floating-note note-three">♡ Achieve</div>
+            </div>
+        </section>
+
+
+        <!-- Statistics -->
+        <section class="stats-grid">
+
+            <article class="stat-card purple-card">
+                <div class="stat-top">
+                    <span>Learner Community</span>
+                    <span>♙</span>
+                </div>
+                <h2 id="totalLearners">0</h2>
+                <p>Registered learners</p>
+            </article>
+
+            <article class="stat-card peach-card">
+                <div class="stat-top">
+                    <span>Today's Attendance</span>
+                    <span>✓</span>
+                </div>
+                <h2 id="presentLearners">0</h2>
+                <p>Learners present</p>
+            </article>
+
+            <article class="stat-card yellow-card">
+                <div class="stat-top">
+                    <span>Need Follow-up</span>
+                    <span>↗</span>
+                </div>
+                <h2 id="absentLearners">0</h2>
+                <p>Learners absent today</p>
+            </article>
+
+            <article class="stat-card mint-card">
+                <div class="stat-top">
+                    <span>Participation</span>
+                    <span>%</span>
+                </div>
+                <h2 id="attendanceRate">0%</h2>
+                <p>Today's attendance rate</p>
+            </article>
+
+        </section>
+
+
+        <!-- Attendance and Learning -->
+        <section class="content-grid">
+
+            <div class="panel" id="attendance">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">DAILY RECORD</p>
+                        <h2>Attendance Snapshot</h2>
+                    </div>
+                    <span id="todayDate" class="date-label"></span>
+                </div>
+
+                <div class="attendance-visual">
+                    <div class="progress-ring" id="progressRing">
+                        <div class="ring-inner">
+                            <strong id="ringPercent">0%</strong>
+                            <span>Present</span>
+                        </div>
+                    </div>
+
+                    <div class="attendance-legend">
+                        <p>🟣 Present
+                            <strong id="legendPresent">0</strong>
+                        </p>
+                        <p>🟠 Absent
+                            <strong id="legendAbsent">0</strong>
+                        </p>
+                        <p>⚪ Total
+                            <strong id="legendTotal">0</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <button class="text-link" id="attendanceButton">
+                    Manage attendance →
+                </button>
+            </div>
+
+
+            <div class="panel" id="progress">
+                <p class="eyebrow">THE LEARNING JOURNEY</p>
+                <h2>Learning Beyond Numbers</h2>
+
+                <div class="journey-item">
+                    <div class="journey-icon purple-icon">Aa</div>
+                    <div>
+                        <h3>Reading & Writing</h3>
+                        <p>Build essential literacy skills.</p>
+                    </div>
+                </div>
+
+                <div class="journey-item">
+                    <div class="journey-icon orange-icon">123</div>
+                    <div>
+                        <h3>Basic Mathematics</h3>
+                        <p>Strengthen everyday numeracy.</p>
+                    </div>
+                </div>
+
+                <div class="journey-item">
+                    <div class="journey-icon green-icon">✓</div>
+                    <div>
+                        <h3>Progress Tracking</h3>
+                        <p>Record learning achievements.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- Attendance Management -->
+<section class="panel" id="attendanceManagement">
+    <p class="eyebrow">DAILY RECORD</p>
+    <h2>Manage Learner Attendance</h2>
+    <p class="muted">Select the date and mark each learner's attendance.</p>
+
+    <div class="attendance-controls">
+        <label for="attendanceDate">Select Date</label>
+        <input type="date" id="attendanceDate">
+        <button type="button" class="primary-btn" id="loadAttendance">
+            Load Learners
+        </button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Learner Name</th>
+                    <th>Attendance Status</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceTable"></tbody>
+        </table>
+    </div>
+
+    <button type="button" class="primary-btn" id="saveAttendance">
+        Save Attendance
+    </button>
+
+    <p id="attendanceMessage"></p>
+</section>
+
+
+        <!-- Learner Registration Form -->
+        <section class="panel registration-panel hidden" id="registration">
+            <p class="eyebrow">LEARNER MANAGEMENT</p>
+            <h2>Register a New Learner</h2>
+            <p class="muted">Enter the learner's basic information.</p>
+
+            <form id="registrationForm" class="registration-form">
+                <div>
+                    <label for="learnerName">Full Name</label>
+                    <input type="text" id="learnerName"
+                           placeholder="Enter full name" required>
+                </div>
+
+                <div>
+                    <label for="learnerAge">Age</label>
+                    <input type="number" id="learnerAge"
+                           min="18" max="120"
+                           placeholder="Enter age" required>
+                </div>
+
+                <div>
+                    <label for="learnerPhone">Phone Number</label>
+                    <input type="tel" id="learnerPhone"
+                           placeholder="Enter phone number"
+                           pattern="[0-9]{10}" required>
+                </div>
+
+                <div>
+                    <label for="learnerGender">Gender</label>
+                    <select id="learnerGender" required>
+                        <option value="">Select gender</option>
+                        <option>Female</option>
+                        <option>Male</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="full-width">
+                    <label for="learnerAddress">Address</label>
+                    <textarea id="learnerAddress"
+                              placeholder="Enter address"
+                              required></textarea>
+                </div>
+
+                <button type="submit" class="primary-btn">
+                    Save Learner
+                </button>
+            </form>
+        </section>
+
+
+        <!-- Learner Directory -->
+        <section class="panel hidden" id="learners">
+            <p class="eyebrow">LEARNER MANAGEMENT</p>
+            <h2>Registered Learners</h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Phone</th>
+                            <th>Gender</th>
+                        </tr>
+                    </thead>
+                    <tbody id="learnerTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+
+      <!-- Learning Progress Tracker -->
+<section class="panel" id="learningProgress">
+
+    <p class="eyebrow">GROWTH & ACHIEVEMENT</p>
+    <h2>Learning Progress Tracker</h2>
+
+    <p class="muted">
+        Track the learning journey of every adult learner.
+    </p>
+
+    <form id="progressForm" class="registration-form">
+
+        <div>
+            <label for="progressLearner">Select Learner</label>
+            <select id="progressLearner" required>
+                <option value="">Choose a learner</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="learningSubject">Learning Area</label>
+            <select id="learningSubject" required>
+                <option value="">Choose a subject</option>
+                <option value="Reading">Reading</option>
+                <option value="Writing">Writing</option>
+                <option value="Mathematics">Basic Mathematics</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="progressPercentage">Progress (%)</label>
+            <input type="number" id="progressPercentage"
+                   min="0" max="100"
+                   placeholder="Enter percentage" required>
+        </div>
+
+        <div>
+            <label for="progressRemark">Learning Remark</label>
+            <select id="progressRemark" required>
+                <option value="">Choose remark</option>
+                <option value="Needs Support">Needs Support</option>
+                <option value="Making Progress">Making Progress</option>
+                <option value="Good Progress">Good Progress</option>
+                <option value="Excellent">Excellent</option>
+            </select>
+        </div>
+
+        <div class="full-width">
+            <label for="progressNotes">Additional Notes</label>
+            <textarea id="progressNotes"
+                      placeholder="Describe the learner's achievements"></textarea>
+        </div>
+
+        <button type="submit" class="primary-btn">
+            Save Learning Progress
+        </button>
+
+    </form>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Learner</th>
+                    <th>Subject</th>
+                    <th>Progress</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody id="progressTable"></tbody>
+        </table>
+    </div>
+
+</section>
+</section>
+
+<!-- Smart Learning Assistant -->
+<section id="smartAssistant" class="panel smart-assistant-section">
+
+    <div class="section-heading">
+        <div>
+            <h2>🧠 Smart Learning Assistant</h2>
+            <p>Personalized support for every adult learner.</p>
+        </div>
+    </div>
+
+    <div class="smart-summary">
+
+        <div class="smart-card">
+            <h3>Total Learners Analyzed</h3>
+            <p id="smartTotal">0</p>
+        </div>
+
+        <div class="smart-card">
+            <h3>Need Extra Support</h3>
+            <p id="smartSupport">0</p>
+        </div>
+
+        <div class="smart-card">
+            <h3>Making Good Progress</h3>
+            <p id="smartGoodProgress">0</p>
+        </div>
+
+    </div>
+
+    <div class="smart-recommendations">
+
+        <h3>Personalized Learning Suggestions</h3>
+
+        <p class="smart-description">
+            Review each learner's progress and discover useful learning activities.
+        </p>
+
+        <div id="smartLearnerResults">
+            <p>Record learning progress to generate suggestions.</p>
+        </div>
+
+        <button type="button" id="refreshSmartAssistant">
+            Analyze Learning Progress
+        </button>
+
+    </div>
+
+</section>
+<!-- Learner Profile Section -->
+<section id="learnerProfile" class="panel learner-profile-section">
+
+    <h2>👤 Learner Profile</h2>
+    <p class="profile-subtitle">
+        View learner information, attendance, progress, and achievements.
+    </p>
+
+    <!-- Select Learner -->
+    <div class="profile-search">
+        <label for="profileLearnerSelect">Select Learner:</label>
+
+        <select id="profileLearnerSelect">
+            <option value="">-- Select a Learner --</option>
+        </select>
+
+        <button type="button" id="viewProfileBtn">
+            View Profile
+        </button>
+    </div>
+
+    <!-- Profile Details -->
+    <div id="learnerProfileDetails" class="learner-profile-details">
+
+        <p class="profile-empty">
+            Select a learner to view their profile.
+        </p>
+
+    </div>
+
+</section>
+<!-- Achievements and Certificates -->
+<section id="achievements" class="panel achievements-section">
+
+    <h2>🏆 Achievements and Certificates</h2>
+
+    <p class="section-description">
+        Celebrate every step of your learning journey!
+    </p>
+
+    <div class="achievement-controls">
+
+        <label for="achievementLearner">Select Learner:</label>
+
+        <select id="achievementLearner">
+            <option value="">Choose a learner</option>
+        </select>
+
+        <button type="button" id="checkAchievements">
+            Check Achievements
+        </button>
+
+    </div>
+
+    <div id="achievementResults" class="achievement-grid">
+        <p>Select a learner to view achievements.</p>
+    </div>
+
+    <div id="certificateArea" class="certificate-area hidden">
+
+        <h2>📜 Certificate of Achievement</h2>
+
+        <div id="certificateContent" class="certificate-content"></div>
+
+        <button type="button" id="printCertificate">
+            🖨️ Print Certificate
+        </button>
+
+    </div>
+
+</section>
+
+        <section class="quote-banner">
+            <span class="quote-icon">“</span>
+            <div>
+                <p id="dailyQuote">
+                    Learning is a journey, and every new word is a step forward.
+                </p>
+                <span>A DAILY REMINDER FROM ADULT LITERACY PROGRAM</span>
+            </div>
+        </section>
+
+        <footer>
+            <span> Adult Literacy Program</span>
+            <span>Empowering minds, one learner at a time.</span>
+        </footer>
+
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
