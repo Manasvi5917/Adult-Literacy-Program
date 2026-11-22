@@ -68,13 +68,12 @@ signupForm.addEventListener("submit", function (event) {
     }
 
     const usernameExists = accounts.some(function (account) {
-        return account.username.toLowerCase() === username.toLowerCase();
-    });
+    return String(account.username || "").toLowerCase() === username.toLowerCase();
+});
 
-    const emailExists = accounts.some(function (account) {
-        return account.email.toLowerCase() === email.toLowerCase();
-    });
-
+const emailExists = accounts.some(function (account) {
+    return String(account.email || "").toLowerCase() === email.toLowerCase();
+});
     if (usernameExists || emailExists) {
         signupMessage.style.color = "red";
         signupMessage.textContent =
@@ -216,90 +215,102 @@ function showDashboard() {
     displayLearners();
 }
 
-// Navigation within the same page
+
+
+// Navigation and dashboard section switching
+
 function showSection(sectionId) {
+
+    // Hide all dashboard sections
+    document.querySelectorAll("#dashboardPage .dashboard-section")
+        .forEach(function (section) {
+            section.classList.add("hidden");
+        });
+
+    // Show the selected section
     const section = document.getElementById(sectionId);
 
     if (section) {
-        section.scrollIntoView({ behavior: "smooth", block: "start" });
+        section.classList.remove("hidden");
+
+        section.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
     }
 }
 
+// Navigation links
 document.querySelectorAll(".nav-link").forEach(function (link) {
+
     link.addEventListener("click", function (event) {
         event.preventDefault();
 
         const sectionId = link.getAttribute("href").substring(1);
-        
-if (sectionId === "achievements") {
-    document.getElementById("registration").classList.add("hidden");
-    document.getElementById("learners").classList.add("hidden");
 
-    loadAchievementLearners();
-
-    document.querySelectorAll(".nav-link").forEach(function (item) {
-        item.classList.remove("active");
-    });
-
-    link.classList.add("active");
-
-    showSection("achievements");
-    return;
-}
-        if (sectionId === "learnerProfile") {
-    document.getElementById("registration").classList.add("hidden");
-    document.getElementById("learners").classList.add("hidden");
-
-    loadProfileLearners();
-    showSection("learnerProfile");
-
-    return;
-}
-
-
-        if (sectionId === "smartAssistant") {
-    document.getElementById("registration").classList.add("hidden");
-    document.getElementById("learners").classList.add("hidden");
-
-    loadProgressLearners();
-    displayProgress();
-    analyzeLearningProgress();
-
-    showSection("smartAssistant");
-    return;
-}
+        // Update active navigation link
         document.querySelectorAll(".nav-link").forEach(function (item) {
             item.classList.remove("active");
         });
 
         link.classList.add("active");
 
-        if (sectionId === "overview") {
-            document.getElementById("registration").classList.add("hidden");
-            document.getElementById("learners").classList.add("hidden");
-            document.getElementById("overview").scrollIntoView({
-                behavior: "smooth"
-            });
-        } else if (sectionId === "registration") {
-            document.getElementById("registration").classList.remove("hidden");
-            document.getElementById("learners").classList.add("hidden");
-            showSection("registration");
-        } else if (sectionId === "learners") {
-            document.getElementById("learners").classList.remove("hidden");
-            document.getElementById("registration").classList.add("hidden");
-            displayLearners();
-            showSection("learners");
-        } else if (sectionId === "attendance") {
-            document.getElementById("registration").classList.add("hidden");
-            document.getElementById("learners").classList.add("hidden");
-            showSection("attendance");
-        } else if (sectionId === "progress") {
-            document.getElementById("registration").classList.add("hidden");
-            document.getElementById("learners").classList.add("hidden");
-            showSection("progress");
+        // Load section data when needed
+        if (sectionId === "achievements") {
+            loadAchievementLearners();
         }
+
+        if (sectionId === "learnerProfile") {
+            loadProfileLearners();
+        }
+
+        if (sectionId === "smartAssistant") {
+            loadProgressLearners();
+            displayProgress();
+            analyzeLearningProgress();
+        }
+
+        // Display selected section
+        showSection(sectionId);
     });
 });
+
+document.querySelectorAll(".nav-link").forEach(function (link) {
+    link.addEventListener("click", function (event) {
+        event.preventDefault();
+
+        const sectionId = link.getAttribute("href").substring(1);
+
+        // Update active navigation option
+        document.querySelectorAll(".nav-link").forEach(function (item) {
+            item.classList.remove("active");
+        });
+
+        link.classList.add("active");
+
+        // Hide optional sections first
+        document.getElementById("registration").classList.add("hidden");
+        document.getElementById("learners").classList.add("hidden");
+
+        if (sectionId === "achievements") {
+            loadAchievementLearners();
+        }
+
+        if (sectionId === "learnerProfile") {
+            loadProfileLearners();
+        }
+
+        if (sectionId === "smartAssistant") {
+            loadProgressLearners();
+            displayProgress();
+            analyzeLearningProgress();
+        }
+
+        // Show the selected section
+        showSection(sectionId);
+    });
+});
+
 
 // Open registration form
 document.getElementById("registerButton").addEventListener("click", function () {
@@ -1365,3 +1376,26 @@ if (printCertificateButton) {
 
 // Load learners when the page is opened.
 loadAchievementLearners();
+
+
+// LITRIVA HOMEPAGE BUTTON
+
+const homepageLoginButton = document.getElementById("homepageLoginButton");
+const homePage = document.getElementById("homePage");
+
+if (homepageLoginButton && homePage && loginPage) {
+    homepageLoginButton.addEventListener("click", function () {
+        homePage.classList.add("hidden");
+        loginPage.classList.remove("hidden");
+    });
+}
+// HOMEPAGE SIGNUP BUTTON
+
+const homepageSignupButton = document.getElementById("homepageSignupButton");
+
+if (homepageSignupButton && homePage && signupPage) {
+    homepageSignupButton.addEventListener("click", function () {
+        homePage.classList.add("hidden");
+        signupPage.classList.remove("hidden");
+    });
+}

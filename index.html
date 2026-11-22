@@ -7,16 +7,74 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- HOMEPAGE -->
+<!-- HOMEPAGE -->
+<section id="homePage" class="home-page">
+
+    <div class="litriva-welcome">
+
+        <h1 class="litriva-title">
+            <span>L</span><span>i</span><span>t</span><span>r</span><span>i</span><span>v</span><span>a</span>
+        </h1>
+
+        <marquee behavior="scroll" direction="left" scrollamount="5">
+            Every Journey Begins with Learning
+        </marquee>
+
+        <p class="home-description">
+            Welcome to Litriva! Our Adult Literacy Program helps learners
+            improve their learning journey by providing an easy way to
+            register, record attendance and track learning progress.
+        </p>
+
+        <div class="home-features">
+
+            <div class="home-feature">
+                <h3>Learner Registration</h3>
+                <p>Register learners and manage their details.</p>
+            </div>
+
+            <div class="home-feature">
+                <h3>Attendance Tracking</h3>
+                <p>Record and monitor daily attendance.</p>
+            </div>
+
+            <div class="home-feature">
+                <h3>Learning Progress</h3>
+                <p>Monitor reading, writing and mathematics progress.</p>
+            </div>
+
+        </div>
+
+        <div class="homepage-buttons">
+
+            <button type="button" id="homepageLoginButton">
+                Login →
+            </button>
+
+            <button type="button" id="homepageSignupButton">
+                Sign Up →
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
 <!-- CREATE ACCOUNT PAGE -->
-<section id="signupPage" class="login-page ">
+<section id="signupPage" class="login-page hidden ">
 
     <div class="login-card">
 
-        <h1>Create Your Account</h1>
+        <h1>Litriva</h1>
 
-        <p class="login-subtitle">
-            Adult Literacy Program
-        </p>
+<p class="login-subtitle">
+    Adult Literacy Program
+</p>
+
+<p class="login-subtitle">
+    Registration &amp; Progress Tracker
+</p>
 
         <p class="login-description">
             Register to manage learners and track their progress.
@@ -95,11 +153,16 @@
 <section id="loginPage" class="login-page hidden">
     <div class="login-card">
        
+<h1>Litriva</h1>
 
-        <h1>Adult Literacy Program</h1>
-        <p class="login-subtitle">
-            Registration &amp; Progress Tracker
-        </p>
+<p class="login-subtitle">
+    Adult Literacy Program
+</p>
+
+<p class="login-subtitle">
+    Registration &amp; Progress Tracker
+</p>
+      
 
         <h2>Welcome Back!</h2>
         <p class="login-description">
@@ -135,49 +198,43 @@
 <!-- DASHBOARD PAGE -->
 <div id="dashboardPage" class="app hidden">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon">L</div>
-            <div>
-                <h2>Literacy</h2>
-                <span>CONNECT</span>
-            </div>
-        </div>
+<!-- Top Horizontal Navigation -->
+<header class="top-navigation">
 
-        <p class="menu-label">WORKSPACE</p>
+    <div class="brand">
+    <div>
+        <h2>Litriva</h2>
+        <span>Adult Literacy Program</span>
+    </div>
+</div>
 
+    <nav class="top-nav-links">
         <a href="#overview" class="nav-link active">⌂ Overview</a>
+
         <a href="#registration" class="nav-link">＋ Register Learner</a>
-    <a href="#learningProgress" class="nav-link">↗ Learning Progress</a>
-    <a href="#smartAssistant" class="nav-link">
-    🧠 Smart Learning Assistant
-</a>
-<a href="#learnerProfile" class="nav-link">
-    👤 Learner Profile
-</a>
-<a href="#achievements" class="nav-link">
-    🏆 Achievements & Certificates
-</a>
-        <a href="#attendance" class="nav-link">▦ Attendance</a>
+
+        <a href="#learningProgress" class="nav-link">↗ Learning Progress</a>
+
+        <a href="#smartAssistant" class="nav-link">🧠 Smart Assistant</a>
+
+        <a href="#learnerProfile" class="nav-link">👤 Learner Profile</a>
+
+        <a href="#achievements" class="nav-link">🏆 Achievements</a>
+
+        <a href="#attendanceManagement" class="nav-link">▦ Attendance</a>
+
         <a href="#progress" class="nav-link">↗ Learning Journey</a>
+    </nav>
 
-        <div class="sidebar-bottom">
-            <div class="help-card">
-                <span>💡</span>
-                <h3>Small steps matter.</h3>
-                <p>Every lesson creates a new opportunity.</p>
-            </div>
+   
 
-            <button id="logoutButton" class="logout">
-                ↪ Logout
-            </button>
-        </div>
-    </aside>
+</header>
 
 
-    <!-- Main Dashboard -->
-    <main class="main" id="overview">
+   <main class="main">
+
+    <!-- OVERVIEW SECTION -->
+    <section id="overview" class="dashboard-section">
 
         <header class="topbar">
             <div>
@@ -307,7 +364,7 @@
             </div>
 
 
-            <div class="panel" id="progress">
+                  <div class="panel" id="progress">
                 <p class="eyebrow">THE LEARNING JOURNEY</p>
                 <h2>Learning Beyond Numbers</h2>
 
@@ -337,8 +394,10 @@
             </div>
 
         </section>
+  
         <!-- Attendance Management -->
-<section class="panel" id="attendanceManagement">
+<section class="panel dashboard-section hidden" id="attendanceManagement">
+
     <p class="eyebrow">DAILY RECORD</p>
     <h2>Manage Learner Attendance</h2>
     <p class="muted">Select the date and mark each learner's attendance.</p>
@@ -346,6 +405,7 @@
     <div class="attendance-controls">
         <label for="attendanceDate">Select Date</label>
         <input type="date" id="attendanceDate">
+
         <button type="button" class="primary-btn" id="loadAttendance">
             Load Learners
         </button>
@@ -359,6 +419,7 @@
                     <th>Attendance Status</th>
                 </tr>
             </thead>
+
             <tbody id="attendanceTable"></tbody>
         </table>
     </div>
@@ -368,84 +429,90 @@
     </button>
 
     <p id="attendanceMessage"></p>
+
+</section>
+      
+
+<!-- Learner Registration Form -->
+<section class="panel registration-panel dashboard-section hidden" id="registration">
+
+    <p class="eyebrow">LEARNER MANAGEMENT</p>
+    <h2>Register a New Learner</h2>
+    <p class="muted">Enter the learner's basic information.</p>
+
+    <form id="registrationForm" class="registration-form">
+
+        <div>
+            <label for="learnerName">Full Name</label>
+            <input type="text" id="learnerName"
+                   placeholder="Enter full name" required>
+        </div>
+
+        <div>
+            <label for="learnerAge">Age</label>
+            <input type="number" id="learnerAge"
+                   min="18" max="120"
+                   placeholder="Enter age" required>
+        </div>
+
+        <div>
+            <label for="learnerPhone">Phone Number</label>
+            <input type="tel" id="learnerPhone"
+                   placeholder="Enter phone number"
+                   pattern="[0-9]{10}" required>
+        </div>
+
+        <div>
+            <label for="learnerGender">Gender</label>
+            <select id="learnerGender" required>
+                <option value="">Select gender</option>
+                <option>Female</option>
+                <option>Male</option>
+                <option>Other</option>
+            </select>
+        </div>
+
+        <div class="full-width">
+            <label for="learnerAddress">Address</label>
+            <textarea id="learnerAddress"
+                      placeholder="Enter address"
+                      required></textarea>
+        </div>
+
+        <button type="submit" class="primary-btn">
+            Save Learner
+        </button>
+
+    </form>
+
 </section>
 
+   <!-- Learner Directory -->
+<section class="panel dashboard-section hidden" id="learners">
 
-        <!-- Learner Registration Form -->
-        <section class="panel registration-panel hidden" id="registration">
-            <p class="eyebrow">LEARNER MANAGEMENT</p>
-            <h2>Register a New Learner</h2>
-            <p class="muted">Enter the learner's basic information.</p>
+    <p class="eyebrow">LEARNER MANAGEMENT</p>
+    <h2>Registered Learners</h2>
 
-            <form id="registrationForm" class="registration-form">
-                <div>
-                    <label for="learnerName">Full Name</label>
-                    <input type="text" id="learnerName"
-                           placeholder="Enter full name" required>
-                </div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Phone</th>
+                    <th>Gender</th>
+                </tr>
+            </thead>
 
-                <div>
-                    <label for="learnerAge">Age</label>
-                    <input type="number" id="learnerAge"
-                           min="18" max="120"
-                           placeholder="Enter age" required>
-                </div>
+            <tbody id="learnerTable"></tbody>
+        </table>
+    </div>
 
-                <div>
-                    <label for="learnerPhone">Phone Number</label>
-                    <input type="tel" id="learnerPhone"
-                           placeholder="Enter phone number"
-                           pattern="[0-9]{10}" required>
-                </div>
-
-                <div>
-                    <label for="learnerGender">Gender</label>
-                    <select id="learnerGender" required>
-                        <option value="">Select gender</option>
-                        <option>Female</option>
-                        <option>Male</option>
-                        <option>Other</option>
-                    </select>
-                </div>
-
-                <div class="full-width">
-                    <label for="learnerAddress">Address</label>
-                    <textarea id="learnerAddress"
-                              placeholder="Enter address"
-                              required></textarea>
-                </div>
-
-                <button type="submit" class="primary-btn">
-                    Save Learner
-                </button>
-            </form>
-        </section>
-
-
-        <!-- Learner Directory -->
-        <section class="panel hidden" id="learners">
-            <p class="eyebrow">LEARNER MANAGEMENT</p>
-            <h2>Registered Learners</h2>
-
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Age</th>
-                            <th>Phone</th>
-                            <th>Gender</th>
-                        </tr>
-                    </thead>
-                    <tbody id="learnerTable"></tbody>
-                </table>
-            </div>
-        </section>
+</section>     
 
 
       <!-- Learning Progress Tracker -->
-<section class="panel" id="learningProgress">
-
+<section class="panel dashboard-section hidden" id="learningProgress">
     <p class="eyebrow">GROWTH & ACHIEVEMENT</p>
     <h2>Learning Progress Tracker</h2>
 
@@ -517,10 +584,10 @@
     </div>
 
 </section>
-</section>
+
 
 <!-- Smart Learning Assistant -->
-<section id="smartAssistant" class="panel smart-assistant-section">
+<section id="smartAssistant" class="panel smart-assistant-section dashboard-section hidden">
 
     <div class="section-heading">
         <div>
@@ -567,8 +634,9 @@
     </div>
 
 </section>
+
 <!-- Learner Profile Section -->
-<section id="learnerProfile" class="panel learner-profile-section">
+<section id="learnerProfile" class="panel learner-profile-section dashboard-section hidden">
 
     <h2>👤 Learner Profile</h2>
     <p class="profile-subtitle">
@@ -595,11 +663,19 @@
             Select a learner to view their profile.
         </p>
 
+       </div>
+
+    <!-- Logout Button -->
+    <div class="profile-logout">
+        <button type="button" id="logoutButton" class="logout">
+            ↪ Logout
+        </button>
     </div>
 
 </section>
+
 <!-- Achievements and Certificates -->
-<section id="achievements" class="panel achievements-section">
+<section id="achievements" class="panel achievements-section dashboard-section hidden">
 
     <h2>🏆 Achievements and Certificates</h2>
 
