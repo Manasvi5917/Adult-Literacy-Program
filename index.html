@@ -208,21 +208,33 @@
     </div>
 </div>
 
-    <nav class="top-nav-links">
-        <a href="#overview" class="nav-link active">⌂ Overview</a>
+  <nav class="top-nav-links" id="dashboardNavigation">
 
-        <a href="#learningProgress" class="nav-link">↗ Learning Progress</a>
+    <a href="#overview" class="nav-link active" id="overviewNav">
+        ⌂ Overview
+    </a>
 
-        <a href="#smartAssistant" class="nav-link">🧠 Smart Assistant</a>
+    <a href="#learningProgress" class="nav-link" id="progressNav">
+        ↗ Learning Progress
+    </a>
 
-        <a href="#learnerProfile" class="nav-link">👤 Learner Profile</a>
+    <a href="#smartAssistant" class="nav-link" id="assistantNav">
+        🧠 Smart Assistant
+    </a>
 
-        <a href="#achievements" class="nav-link">🏆 Achievements</a>
+    <a href="#learnerProfile" class="nav-link" id="profileNav">
+        👤 Learner Profile
+    </a>
 
-        <a href="#attendanceManagement" class="nav-link">▦ Attendance</a>
+    <a href="#achievements" class="nav-link" id="achievementsNav">
+        🏆 Achievements
+    </a>
 
-       
-    </nav>
+    <a href="#attendanceManagement" class="nav-link" id="attendanceNav">
+        ▦ Attendance
+    </a>
+
+</nav>
 
    
 
@@ -231,178 +243,225 @@
 
    <main class="main">
 
-    <!-- OVERVIEW SECTION -->
-    <section id="overview" class="dashboard-section">
+  
+<!-- OVERVIEW SECTION -->
+<section id="overview" class="dashboard-section">
 
-        <header class="topbar">
+    <header class="topbar">
+        <div>
+            <p class="eyebrow" id="overviewEyebrow">ADULT EDUCATION MANAGEMENT</p>
+            <h1 id="overviewHeading">Your learning community.</h1>
+            <p class="muted" id="overviewSubtitle">
+                A little progress each day adds up to big results.
+            </p>
+        </div>
+
+        <div class="profile" id="overviewProfile">
+            <div class="avatar" id="overviewAvatar">A</div>
             <div>
-                <p class="eyebrow">ADULT EDUCATION MANAGEMENT</p>
-                <h1>Your learning community.</h1>
-                <p class="muted">
-                    A little progress each day adds up to big results.
-                </p>
+                <strong id="overviewProfileName">Administrator</strong>
+                <p id="overviewProfileRole">Program Coordinator</p>
             </div>
+        </div>
+    </header>
 
-            <div class="profile">
-                <div class="avatar">A</div>
+    <!-- Admin Welcome Banner -->
+    <section class="hero" id="adminHero">
+        <div class="hero-content">
+            <span class="badge">✦ MAKING A DIFFERENCE</span>
+            <h2>Education has<br><span>no age limit.</span></h2>
+            <p>
+                Help every adult learner take another step
+                toward reading, writing, and a brighter future.
+            </p>
+
+            <button class="primary-btn" id="registerButton">
+                + Register a Learner
+            </button>
+        </div>
+
+        <div class="hero-art">
+            <div class="book-circle">📚</div>
+            <div class="floating-note note-one">✦ Learn</div>
+            <div class="floating-note note-two">✎ Grow</div>
+            <div class="floating-note note-three">♡ Achieve</div>
+        </div>
+    </section>
+
+    <!-- Learner Welcome Banner -->
+    <section class="hero hidden" id="learnerHero">
+        <div class="hero-content">
+            <span class="badge">✦ YOUR LEARNING JOURNEY</span>
+            <h2>Keep learning,<br><span>keep growing!</span></h2>
+            <p>
+                Every day is a new opportunity to learn.
+                Keep building your reading, writing and mathematics skills.
+            </p>
+            <button class="primary-btn" id="overviewAssessmentButton">
+                Start Assessment →
+            </button>
+        </div>
+
+        <div class="hero-art">
+            <div class="book-circle">📚</div>
+            <div class="floating-note note-one">✦ Learn</div>
+            <div class="floating-note note-two">✎ Grow</div>
+            <div class="floating-note note-three">♡ Achieve</div>
+        </div>
+    </section>
+
+    <!-- Admin Statistics -->
+    <section class="stats-grid" id="adminStats">
+
+        <article class="stat-card purple-card">
+            <div class="stat-top">
+                <span>Learner Community</span><span>♙</span>
+            </div>
+            <h2 id="totalLearners">0</h2>
+            <p>Registered learners</p>
+        </article>
+
+        <article class="stat-card peach-card">
+            <div class="stat-top">
+                <span>Today's Attendance</span><span>✓</span>
+            </div>
+            <h2 id="presentLearners">0</h2>
+            <p>Learners present</p>
+        </article>
+
+        <article class="stat-card yellow-card">
+            <div class="stat-top">
+                <span>Need Follow-up</span><span>↗</span>
+            </div>
+            <h2 id="absentLearners">0</h2>
+            <p>Learners absent today</p>
+        </article>
+
+        <article class="stat-card mint-card">
+            <div class="stat-top">
+                <span>Participation</span><span>%</span>
+            </div>
+            <h2 id="attendanceRate">0%</h2>
+            <p>Today's attendance rate</p>
+        </article>
+
+    </section>
+
+    <!-- Admin Attendance and Learning -->
+    <section class="content-grid" id="adminOverviewContent">
+
+        <div class="panel" id="attendance">
+            <div class="panel-heading">
                 <div>
-                    <strong>Administrator</strong>
-                    <p>Program Coordinator</p>
+                    <p class="eyebrow">DAILY RECORD</p>
+                    <h2>Attendance Snapshot</h2>
                 </div>
-            </div>
-        </header>
-
-
-        <!-- Welcome Banner -->
-        <section class="hero">
-            <div class="hero-content">
-                <span class="badge">✦ MAKING A DIFFERENCE</span>
-
-                <h2>Education has<br>
-                    <span>no age limit.</span>
-                </h2>
-
-                <p>
-                    Help every adult learner take another step
-                    toward reading, writing, and a brighter future.
-                </p>
-
-                <button class="primary-btn" id="registerButton">
-                    + Register a Learner
-                </button>
+                <span id="todayDate" class="date-label"></span>
             </div>
 
-            <div class="hero-art">
-                <div class="book-circle">📚</div>
-                <div class="floating-note note-one">✦ Learn</div>
-                <div class="floating-note note-two">✎ Grow</div>
-                <div class="floating-note note-three">♡ Achieve</div>
-            </div>
-        </section>
-
-
-        <!-- Statistics -->
-        <section class="stats-grid">
-
-            <article class="stat-card purple-card">
-                <div class="stat-top">
-                    <span>Learner Community</span>
-                    <span>♙</span>
-                </div>
-                <h2 id="totalLearners">0</h2>
-                <p>Registered learners</p>
-            </article>
-
-            <article class="stat-card peach-card">
-                <div class="stat-top">
-                    <span>Today's Attendance</span>
-                    <span>✓</span>
-                </div>
-                <h2 id="presentLearners">0</h2>
-                <p>Learners present</p>
-            </article>
-
-            <article class="stat-card yellow-card">
-                <div class="stat-top">
-                    <span>Need Follow-up</span>
-                    <span>↗</span>
-                </div>
-                <h2 id="absentLearners">0</h2>
-                <p>Learners absent today</p>
-            </article>
-
-            <article class="stat-card mint-card">
-                <div class="stat-top">
-                    <span>Participation</span>
-                    <span>%</span>
-                </div>
-                <h2 id="attendanceRate">0%</h2>
-                <p>Today's attendance rate</p>
-            </article>
-
-        </section>
-
-
-        <!-- Attendance and Learning -->
-        <section class="content-grid">
-
-            <div class="panel" id="attendance">
-                <div class="panel-heading">
-                    <div>
-                        <p class="eyebrow">DAILY RECORD</p>
-                        <h2>Attendance Snapshot</h2>
-                    </div>
-                    <span id="todayDate" class="date-label"></span>
-                </div>
-
-                <div class="attendance-visual">
-                    <div class="progress-ring" id="progressRing">
-                        <div class="ring-inner">
-                            <strong id="ringPercent">0%</strong>
-                            <span>Present</span>
-                        </div>
-                    </div>
-
-                    <div class="attendance-legend">
-                        <p>🟣 Present
-                            <strong id="legendPresent">0</strong>
-                        </p>
-                        <p>🟠 Absent
-                            <strong id="legendAbsent">0</strong>
-                        </p>
-                        <p>⚪ Total
-                            <strong id="legendTotal">0</strong>
-                        </p>
+            <div class="attendance-visual">
+                <div class="progress-ring" id="progressRing">
+                    <div class="ring-inner">
+                        <strong id="ringPercent">0%</strong>
+                        <span>Present</span>
                     </div>
                 </div>
 
-                <button class="text-link" id="attendanceButton">
-                    Manage attendance →
-                </button>
-            </div>
-
-
-                  <div class="panel" id="progress">
-                <p class="eyebrow">THE LEARNING JOURNEY</p>
-                <h2>Learning Beyond Numbers</h2>
-
-                <div class="journey-item">
-                    <div class="journey-icon purple-icon">Aa</div>
-                    <div>
-                        <h3>Reading & Writing</h3>
-                        <p>Build essential literacy skills.</p>
-                    </div>
-                </div>
-
-                <div class="journey-item">
-                    <div class="journey-icon orange-icon">123</div>
-                    <div>
-                        <h3>Basic Mathematics</h3>
-                        <p>Strengthen everyday numeracy.</p>
-                    </div>
-                </div>
-
-                <div class="journey-item">
-                    <div class="journey-icon green-icon">✓</div>
-                    <div>
-                        <h3>Progress Tracking</h3>
-                        <p>Record learning achievements.</p>
-                    </div>
+                <div class="attendance-legend">
+                    <p>🟣 Present <strong id="legendPresent">0</strong></p>
+                    <p>🟠 Absent <strong id="legendAbsent">0</strong></p>
+                    <p>⚪ Total <strong id="legendTotal">0</strong></p>
                 </div>
             </div>
 
-               </section>
- <!-- Daily Quote -->
-        <section class="quote-banner">
-            <span class="quote-icon">“</span>
-            <div>
-                <p id="dailyQuote">
-                    Learning is a journey, and every new word is a step forward.
-                </p>
-                <span>A DAILY REMINDER FROM ADULT LITERACY PROGRAM</span>
+            <button class="text-link" id="attendanceButton">
+                Manage attendance →
+            </button>
+        </div>
+
+        <div class="panel" id="progress">
+            <p class="eyebrow">THE LEARNING JOURNEY</p>
+            <h2>Learning Beyond Numbers</h2>
+
+            <div class="journey-item">
+                <div class="journey-icon purple-icon">Aa</div>
+                <div>
+                    <h3>Reading & Writing</h3>
+                    <p>Build essential literacy skills.</p>
+                </div>
             </div>
-        </section>
-    </section> <!-- End of Overview Section -->
+
+            <div class="journey-item">
+                <div class="journey-icon orange-icon">123</div>
+                <div>
+                    <h3>Basic Mathematics</h3>
+                    <p>Strengthen everyday numeracy.</p>
+                </div>
+            </div>
+
+            <div class="journey-item">
+                <div class="journey-icon green-icon">✓</div>
+                <div>
+                    <h3>Progress Tracking</h3>
+                    <p>Record learning achievements.</p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+   <!-- Learner Personal Overview -->
+<section class="panel hidden" id="learnerOverviewContent">
+
+    <div class="panel-heading">
+        <div>
+            <p class="eyebrow">YOUR LEARNING COMMUNITY</p>
+            <h2>Welcome to Litriva!</h2>
+            <p class="muted">
+                Learn, grow and connect with fellow learners.
+            </p>
+        </div>
+    </div>
+
+    <button type="button" class="primary-btn" id="learnerOverviewRegisterButton">
+        + Register
+    </button>
+
+   
+
+    <div class="panel" style="margin-top: 25px;">
+        <p class="eyebrow">YOUR DAILY RECORD</p>
+        <h2>My Attendance</h2>
+
+        <p id="learnerOverviewAttendance">
+            Your attendance information will appear here.
+        </p>
+
+        <p class="eyebrow">YOUR LEARNING</p>
+        <h2>My Learning Journey</h2>
+
+        <p>
+            Take assessments in Reading, Writing and Basic Mathematics
+            and track your own learning progress.
+        </p>
+    </div>
+
+</section>
+
+    <!-- Daily Quote -->
+    <section class="quote-banner" id="overviewQuote">
+        <span class="quote-icon">“</span>
+        <div>
+            <p id="dailyQuote">
+                Learning is a journey, and every new word is a step forward.
+            </p>
+            <span>A DAILY REMINDER FROM ADULT LITERACY PROGRAM</span>
+        </div>
+    </section>
+
+</section>
+<!-- End of Overview Section -->
+
 
         <!-- Attendance Management --> 
 <section class="panel dashboard-section hidden" id="attendanceManagement">
