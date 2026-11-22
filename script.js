@@ -154,15 +154,99 @@ loginForm.addEventListener("submit", function (event) {
             return;
         }
 
-        loginMessage.style.color = "green";
-        loginMessage.textContent = "Login successful!";
+        // ADMIN LOGIN
+        if (isDemoAdmin || account.role === "admin") {
 
-        setTimeout(function () {
-            loginPage.classList.add("hidden");
-            signupPage.classList.add("hidden");
-            dashboardPage.classList.remove("hidden");
-            showDashboard();
-        }, 500);
+            loginMessage.style.color = "green";
+            loginMessage.textContent = "Admin login successful!";
+
+            setTimeout(function () {
+                loginPage.classList.add("hidden");
+                signupPage.classList.add("hidden");
+                document.getElementById("learnerPortal").classList.add("hidden");
+                dashboardPage.classList.remove("hidden");
+
+                showDashboard();
+            }, 500);
+
+            return;
+        }
+
+        // LEARNER LOGIN
+        if (account.role === "learner") {
+
+            // Automatically record attendance
+            let attendance = [];
+
+            try {
+                attendance = JSON.parse(
+                    localStorage.getItem("literacyAttendance")
+                ) || [];
+            } catch {
+                attendance = [];
+            }
+
+            const today = new Date().toLocaleDateString("en-CA");
+
+            // Prevent duplicate attendance on the same day
+            const alreadyMarked = attendance.some(function (record) {
+                return record.username === account.username
+                    && record.date === today;
+            });
+
+            if (!alreadyMarked) {
+                attendance.push({
+                    name: account.name,
+                    username: account.username,
+                    date: today,
+                    time: new Date().toLocaleTimeString(),
+                    status: "Present"
+                });
+
+                localStorage.setItem(
+                    "literacyAttendance",
+                    JSON.stringify(attendance)
+                );
+            }
+
+            // Store logged-in learner
+            localStorage.setItem(
+                "currentLearner",
+                JSON.stringify(account)
+            );
+
+            loginMessage.style.color = "green";
+            loginMessage.textContent = "Login successful!";
+
+            setTimeout(function () {
+                loginPage.classList.add("hidden");
+                signupPage.classList.add("hidden");
+                dashboardPage.classList.add("hidden");
+
+                const learnerPortal =
+                    document.getElementById("learnerPortal");
+
+                learnerPortal.classList.remove("hidden");
+
+                document.getElementById("learnerPortalName").textContent =
+                    account.name;
+                    
+                    renderLearnerOwnResults();
+
+                document.getElementById("learnerAttendanceStatus").textContent =
+                    alreadyMarked
+                    ? "Your attendance has already been recorded today."
+                    : "Your attendance has been automatically recorded as Present today.";
+
+            }, 500);
+
+            return;
+        }
+
+        // TEACHER / VOLUNTEER RESTRICTION
+        loginMessage.style.color = "red";
+        loginMessage.textContent =
+            "Teacher and Volunteer portals are not yet available.";
 
     } else {
         loginMessage.style.color = "red";
@@ -312,11 +396,13 @@ document.querySelectorAll(".nav-link").forEach(function (link) {
 });
 
 
-// Open registration form
+// Open Registration Page from Overview
 document.getElementById("registerButton").addEventListener("click", function () {
-    document.getElementById("registration").classList.remove("hidden");
-    document.getElementById("learners").classList.add("hidden");
     showSection("registration");
+
+    document.querySelectorAll(".nav-link").forEach(function (link) {
+        link.classList.remove("active");
+    });
 });
 
 // Open attendance section
@@ -560,20 +646,16 @@ const progressForm = document.getElementById("progressForm");
 
 function getProgressRecords() {
     try {
-        return JSON.parse(
-            localStorage.getItem("literacyProgress")
-        ) || [];
+        return JSON.parse(localStorage.getItem("literacyProgress")) || [];
     } catch {
         return [];
     }
 }
 
-// Load registered learners into the dropdown
+// Load registered learners into dropdown
 function loadProgressLearners() {
     const learners = getLearners();
     const dropdown = document.getElementById("progressLearner");
-
-    const previousValue = dropdown.value;
 
     dropdown.replaceChildren();
 
@@ -584,20 +666,171 @@ function loadProgressLearners() {
 
     learners.forEach(function (learner, index) {
         const option = document.createElement("option");
-
         option.value = index;
         option.textContent = learner.name;
-
         dropdown.appendChild(option);
     });
-
-    if (previousValue !== "") {
-        dropdown.value = previousValue;
-    }
 }
 
-// Display saved progress records
+// Skill Assessment Questions
+const skillQuestions = {
+
+    Reading: [
+        {
+            question: "Which word means the opposite of 'big'?",
+            options: ["Small", "Tall", "Wide", "Heavy"],
+            answer: "Small"
+        },
+        {
+            question: "Which word describes a happy person?",
+            options: ["Sad", "Joyful", "Angry", "Tired"],
+            answer: "Joyful"
+        },
+        {
+            question: "Where do we usually buy medicines?",
+            options: ["School", "Farm", "Pharmacy", "Park"],
+            answer: "Pharmacy"
+        },
+        {
+            question: "Choose the correct spelling.",
+            options: ["Frend", "Friend", "Freind", "Friedn"],
+            answer: "Friend"
+        },
+        {
+            question: "What do we use to read a story?",
+            options: ["Book", "Plate", "Chair", "Spoon"],
+            answer: "Book"
+        }
+    ],
+
+    Writing: [
+        {
+            question: "Choose the correct sentence.",
+            options: [
+                "She go to school.",
+                "She goes to school.",
+                "She going school.",
+                "She gone school."
+            ],
+            answer: "She goes to school."
+        },
+        {
+            question: "Which word is correctly spelled?",
+            options: ["Becaus", "Beacause", "Because", "Becouse"],
+            answer: "Because"
+        },
+        {
+            question: "Which punctuation mark ends a question?",
+            options: [".", ",", "!", "?"],
+            answer: "?"
+        },
+        {
+            question: "Choose the correct spelling.",
+            options: ["Apel", "Apple", "Appel", "Aple"],
+            answer: "Apple"
+        },
+        {
+            question: "Choose the correct sentence.",
+            options: [
+                "I are happy.",
+                "I am happy.",
+                "I is happy.",
+                "I be happy."
+            ],
+            answer: "I am happy."
+        }
+    ],
+
+    Mathematics: [
+        {
+            question: "What is 5 + 3?",
+            options: ["6", "7", "8", "9"],
+            answer: "8"
+        },
+        {
+            question: "What is 10 - 4?",
+            options: ["5", "6", "7", "8"],
+            answer: "6"
+        },
+        {
+            question: "What is 3 × 4?",
+            options: ["7", "12", "10", "16"],
+            answer: "12"
+        },
+        {
+            question: "What is 20 ÷ 5?",
+            options: ["2", "3", "4", "5"],
+            answer: "4"
+        },
+        {
+            question: "You have ₹10 and spend ₹4. How much is left?",
+            options: ["₹5", "₹6", "₹7", "₹8"],
+            answer: "₹6"
+        }
+    ]
+};
+
+// Display questions for selected skill
+function displaySkillQuiz() {
+    const subject = document.getElementById("learningSubject").value;
+    const container = document.getElementById("quizContainer");
+
+    container.replaceChildren();
+
+    if (!subject || !skillQuestions[subject]) {
+        const message = document.createElement("p");
+        message.className = "muted";
+        message.textContent =
+            "Select a learner and skill to begin the assessment.";
+
+        container.appendChild(message);
+        return;
+    }
+
+    const questions = skillQuestions[subject];
+
+    questions.forEach(function (item, index) {
+
+        const questionBox = document.createElement("div");
+        questionBox.className = "assessment-question";
+
+        const heading = document.createElement("h3");
+        heading.textContent = (index + 1) + ". " + item.question;
+
+        questionBox.appendChild(heading);
+
+        item.options.forEach(function (option) {
+
+            const label = document.createElement("label");
+            label.className = "assessment-option";
+
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "question" + index;
+            radio.value = option;
+
+            const text = document.createElement("span");
+            text.textContent = option;
+
+            label.append(radio, text);
+            questionBox.appendChild(label);
+        });
+
+        container.appendChild(questionBox);
+    });
+}
+
+// Automatically calculate remark
+function getProgressRemark(percentage) {
+    if (percentage < 40) return "Needs Support";
+    if (percentage < 60) return "Making Progress";
+    if (percentage < 80) return "Good Progress";
+    return "Excellent";
+}
+
+// Display saved progress
 function displayProgress() {
+
     const learners = getLearners();
     const records = getProgressRecords();
     const table = document.getElementById("progressTable");
@@ -605,6 +838,7 @@ function displayProgress() {
     table.replaceChildren();
 
     if (records.length === 0) {
+
         const row = document.createElement("tr");
         const cell = document.createElement("td");
 
@@ -617,15 +851,19 @@ function displayProgress() {
     }
 
     records.forEach(function (record) {
+
         const row = document.createElement("tr");
 
+        // Learner name
         const learnerCell = document.createElement("td");
         learnerCell.textContent =
             learners[record.learnerIndex]?.name || "Learner unavailable";
 
+        // Subject
         const subjectCell = document.createElement("td");
         subjectCell.textContent = record.subject;
 
+        // Percentage
         const progressCell = document.createElement("td");
 
         const bar = document.createElement("div");
@@ -643,6 +881,7 @@ function displayProgress() {
 
         progressCell.append(bar, value);
 
+        // Remark
         const remarkCell = document.createElement("td");
 
         const remark = document.createElement("span");
@@ -662,31 +901,55 @@ function displayProgress() {
     });
 }
 
-// Save learning progress
+// Automatically score and save assessment
 progressForm.addEventListener("submit", function (event) {
+
     event.preventDefault();
 
-    const learners = getLearners();
-    const learnerIndex = document.getElementById("progressLearner").value;
-    const subject = document.getElementById("learningSubject").value;
-    const percentage = Number(
-        document.getElementById("progressPercentage").value
-    );
-    const remark = document.getElementById("progressRemark").value;
-    const notes = document.getElementById("progressNotes").value.trim();
+    const learnerIndex =
+        document.getElementById("progressLearner").value;
 
-    if (
-        learnerIndex === "" ||
-        !learners[Number(learnerIndex)] ||
-        !subject ||
-        !Number.isFinite(percentage) ||
-        percentage < 0 ||
-        percentage > 100 ||
-        !remark
-    ) {
-        alert("Please enter valid learning progress details.");
+    const subject =
+        document.getElementById("learningSubject").value;
+
+    const learners = getLearners();
+
+    if (learnerIndex === "" || !learners[Number(learnerIndex)]) {
+        alert("Please select a learner.");
         return;
     }
+
+    if (!subject || !skillQuestions[subject]) {
+        alert("Please select a learning skill.");
+        return;
+    }
+
+    const questions = skillQuestions[subject];
+    let score = 0;
+
+    // Check all answers
+    for (let i = 0; i < questions.length; i++) {
+
+        const selected = progressForm.querySelector(
+            'input[name="question' + i + '"]:checked'
+        );
+
+        if (!selected) {
+            alert("Please answer all the questions.");
+            return;
+        }
+
+        if (selected.value === questions[i].answer) {
+            score++;
+        }
+    }
+
+    // Calculate percentage
+    const percentage = Math.round(
+        (score / questions.length) * 100
+    );
+
+    const remark = getProgressRemark(percentage);
 
     const records = getProgressRecords();
 
@@ -695,7 +958,7 @@ progressForm.addEventListener("submit", function (event) {
         subject: subject,
         percentage: percentage,
         remark: remark,
-        notes: notes,
+        notes: "",
         date: new Date().toISOString().slice(0, 10)
     });
 
@@ -704,14 +967,26 @@ progressForm.addEventListener("submit", function (event) {
         JSON.stringify(records)
     );
 
-    alert("Learning progress saved successfully!");
+    alert(
+        "Assessment completed!\n\n" +
+        "Score: " + score + "/" + questions.length +
+        "\nProgress: " + percentage + "%" +
+        "\nRemark: " + remark
+    );
 
     progressForm.reset();
+
+    displaySkillQuiz();
     displayProgress();
 });
 
-// Initialize the progress tracker
+// Show questions when skill changes
+document.getElementById("learningSubject")
+    .addEventListener("change", displaySkillQuiz);
+
+// Initialize
 loadProgressLearners();
+displaySkillQuiz();
 displayProgress();
 // ==========================================
 // SMART LEARNING ASSISTANT
@@ -1398,4 +1673,318 @@ if (homepageSignupButton && homePage && signupPage) {
         homePage.classList.add("hidden");
         signupPage.classList.remove("hidden");
     });
+}
+// LEARNER LOGOUT
+document.getElementById("learnerLogoutButton").addEventListener("click", function () {
+
+    localStorage.removeItem("currentLearner");
+
+    document.getElementById("learnerPortal").classList.add("hidden");
+    document.getElementById("dashboardPage").classList.add("hidden");
+    document.getElementById("signupPage").classList.add("hidden");
+    document.getElementById("loginPage").classList.remove("hidden");
+
+    document.getElementById("loginForm").reset();
+    document.getElementById("loginMessage").textContent = "";
+
+});
+// LEARNER SELF-ASSESSMENT
+
+const learnerQuestions = {
+    Reading: [
+        {
+            question: "Which word means the opposite of 'big'?",
+            options: ["Small", "Tall", "Wide", "Long"],
+            answer: "Small"
+        },
+        {
+            question: "Which word is a fruit?",
+            options: ["Chair", "Apple", "Book", "Table"],
+            answer: "Apple"
+        },
+        {
+            question: "Complete the sentence: The sun ___ in the sky.",
+            options: ["sleep", "run", "shines", "eat"],
+            answer: "shines"
+        },
+        {
+            question: "Which word is spelled correctly?",
+            options: ["Frend", "Freind", "Friend", "Friedn"],
+            answer: "Friend"
+        },
+        {
+            question: "What do we use to read a story?",
+            options: ["Book", "Spoon", "Shoes", "Cup"],
+            answer: "Book"
+        }
+    ],
+
+    Writing: [
+        {
+            question: "Which sentence is correct?",
+            options: [
+                "i am happy.",
+                "I am happy.",
+                "i Am happy.",
+                "I am happy"
+            ],
+            answer: "I am happy."
+        },
+        {
+            question: "Which punctuation mark ends a question?",
+            options: [".", ",", "?", "!"],
+            answer: "?"
+        },
+        {
+            question: "Which word is spelled correctly?",
+            options: ["School", "Skool", "Scool", "Shcool"],
+            answer: "School"
+        },
+        {
+            question: "Choose the correct spelling.",
+            options: ["Market", "Markit", "Marcket", "Maket"],
+            answer: "Market"
+        },
+        {
+            question: "Which is a complete sentence?",
+            options: [
+                "Playing outside",
+                "The boy runs.",
+                "On the table",
+                "Very beautiful"
+            ],
+            answer: "The boy runs."
+        }
+    ],
+
+    Mathematics: [
+        {
+            question: "What is 5 + 3?",
+            options: ["6", "7", "8", "9"],
+            answer: "8"
+        },
+        {
+            question: "What is 10 - 4?",
+            options: ["5", "6", "7", "8"],
+            answer: "6"
+        },
+        {
+            question: "What is 3 × 4?",
+            options: ["7", "12", "10", "14"],
+            answer: "12"
+        },
+        {
+            question: "What is 20 ÷ 5?",
+            options: ["2", "3", "4", "5"],
+            answer: "4"
+        },
+        {
+            question: "Which number is the largest?",
+            options: ["15", "25", "10", "20"],
+            answer: "25"
+        }
+    ]
+};
+
+
+// Open assessment area
+document.getElementById("startLearnerAssessment").addEventListener("click", function () {
+
+    const assessmentArea = document.getElementById("learnerAssessmentArea");
+    const quizContainer = document.getElementById("learnerQuizContainer");
+
+    assessmentArea.classList.remove("hidden");
+
+    quizContainer.innerHTML = `
+        <label for="learnerSubject">Choose a learning skill</label>
+
+        <select id="learnerSubject">
+            <option value="">Select a subject</option>
+            <option value="Reading">Reading</option>
+            <option value="Writing">Writing</option>
+            <option value="Mathematics">Basic Mathematics</option>
+        </select>
+
+        <div id="learnerQuestionsArea"></div>
+    `;
+
+    assessmentArea.scrollIntoView({
+        behavior: "smooth"
+    });
+
+    document.getElementById("learnerSubject").addEventListener("change", function () {
+
+        const subject = this.value;
+        const questionsArea = document.getElementById("learnerQuestionsArea");
+
+        if (!subject) {
+            questionsArea.innerHTML = "";
+            return;
+        }
+
+        const questions = learnerQuestions[subject];
+
+        let html = `<form id="learnerAssessmentForm">`;
+
+        questions.forEach(function (q, index) {
+
+            html += `
+                <div class="panel">
+                    <h3>Question ${index + 1}</h3>
+                    <p>${q.question}</p>
+            `;
+
+            q.options.forEach(function (option) {
+
+                html += `
+                    <label style="display:block; margin:10px 0;">
+                        <input type="radio"
+                            name="question${index}"
+                            value="${option}"
+                            required>
+                        ${option}
+                    </label>
+                `;
+
+            });
+
+            html += `</div>`;
+
+        });
+
+        html += `
+            <button type="submit" class="primary-btn">
+                Submit Assessment
+            </button>
+        </form>
+        <p id="learnerAssessmentMessage"></p>
+        `;
+
+        questionsArea.innerHTML = html;
+
+
+        // Submit assessment
+        document.getElementById("learnerAssessmentForm").addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+            const currentLearner = JSON.parse(
+                localStorage.getItem("currentLearner")
+            );
+
+            if (!currentLearner) {
+                alert("Please log in again.");
+                return;
+            }
+
+            let score = 0;
+
+            questions.forEach(function (q, index) {
+
+                const selected = document.querySelector(
+                    `input[name="question${index}"]:checked`
+                );
+
+                if (selected && selected.value === q.answer) {
+                    score++;
+                }
+
+            });
+
+            const percentage = Math.round(
+                (score / questions.length) * 100
+            );
+
+            const result = {
+                name: currentLearner.name,
+                username: currentLearner.username,
+                subject: subject,
+                score: score,
+                totalQuestions: questions.length,
+                percentage: percentage,
+                date: new Date().toLocaleDateString("en-CA"),
+                time: new Date().toLocaleTimeString()
+            };
+
+            let savedResults = [];
+
+            try {
+                savedResults = JSON.parse(
+                    localStorage.getItem("literacyLearnerAssessments")
+                ) || [];
+            } catch {
+                savedResults = [];
+            }
+
+            savedResults.push(result);
+
+            localStorage.setItem(
+                "literacyLearnerAssessments",
+                JSON.stringify(savedResults)
+            );
+
+            document.getElementById("learnerAssessmentMessage").innerHTML = `
+                <h3>Assessment Completed!</h3>
+                <p>Your Score: ${score} / ${questions.length}</p>
+                <p>Your Percentage: ${percentage}%</p>
+                <p>Subject: ${subject}</p>
+            `;
+
+            renderLearnerOwnResults();
+
+            this.querySelector("button[type='submit']").disabled = true;
+
+        });
+
+    });
+
+});
+
+
+// Display only the currently logged-in learner's results
+function renderLearnerOwnResults() {
+
+    const currentLearner = JSON.parse(
+        localStorage.getItem("currentLearner")
+    );
+
+    if (!currentLearner) {
+        return;
+    }
+
+    let savedResults = [];
+
+    try {
+        savedResults = JSON.parse(
+            localStorage.getItem("literacyLearnerAssessments")
+        ) || [];
+    } catch {
+        savedResults = [];
+    }
+
+    const myResults = savedResults.filter(function (result) {
+        return result.username === currentLearner.username;
+    });
+
+    const resultContainer = document.getElementById("learnerOwnResults");
+
+    if (myResults.length === 0) {
+        resultContainer.innerHTML =
+            "<p>You have not completed any assessments yet.</p>";
+        return;
+    }
+
+    resultContainer.innerHTML = myResults.map(function (result) {
+
+        return `
+            <div class="panel">
+                <h3>${result.subject}</h3>
+                <p>Score: ${result.score} / ${result.totalQuestions}</p>
+                <p>Percentage: ${result.percentage}%</p>
+                <p>Date: ${result.date}</p>
+            </div>
+        `;
+
+    }).join("");
+
 }

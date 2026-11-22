@@ -2410,3 +2410,198 @@ footer {
     background: #6547a5;
     color: white;
 }
+/* Clean Overview Page */
+
+#dashboardPage .stats-grid,
+#dashboardPage .content-grid {
+    display: none !important;
+}
+
+/* Modern Litriva Navigation Design */
+
+#dashboardPage .top-navigation {
+    background: #ffffff;
+    color: #302448;
+    padding: 18px 25px;
+    border-bottom: 1px solid #eee8f5;
+    box-shadow: 0 4px 15px rgba(48, 36, 72, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 15px;
+}
+
+#dashboardPage .top-navigation .brand h2 {
+    color: #6547a5;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+#dashboardPage .top-navigation .brand span {
+    color: #89849a;
+    font-size: 12px;
+}
+
+#dashboardPage .top-nav-links {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 5px;
+}
+
+#dashboardPage .top-nav-links .nav-link {
+    color: #5b526d;
+    background: transparent;
+    text-decoration: none;
+    padding: 9px 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: 0.3s ease;
+}
+
+#dashboardPage .top-nav-links .nav-link:hover {
+    background: #f3eefb;
+    color: #6547a5;
+}
+
+#dashboardPage .top-nav-links .nav-link.active {
+    background: #6547a5;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(101, 71, 165, 0.2);
+}
+/* Litriva Attractive Overview Theme */
+
+#overview {
+    background: #faf8f3;
+    padding: 30px;
+    border-radius: 20px;
+}
+
+#overview .topbar {
+    margin-bottom: 30px;
+}
+
+#overview .eyebrow {
+    color: #6547a5;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+#overview .topbar h1 {
+    color: #302448;
+}
+
+#overview .muted {
+    color: #89849a;
+}
+
+/* Welcome Hero Banner */
+
+#overview .hero {
+    background: linear-gradient(135deg, #e8ddf7, #f4eaf8, #fdf1e8);
+    border-radius: 25px;
+    padding: 45px;
+    box-shadow: 0 10px 30px rgba(101, 71, 165, 0.10);
+    border: 1px solid #eee2f7;
+}
+
+#overview .hero h2 {
+    color: #302448;
+    font-size: 42px;
+    line-height: 1.3;
+}
+
+#overview .hero h2 span {
+    color: #6547a5;
+}
+
+#overview .hero p {
+    color: #5b526d;
+    line-height: 1.8;
+}
+
+#overview .hero .badge {
+    background: #ffffff;
+    color: #6547a5;
+    padding: 10px 16px;
+    border-radius: 30px;
+    font-weight: 700;
+}
+
+/* Highlight Register Button */
+
+#overview #registerButton {
+    background: linear-gradient(135deg, #6547a5, #8465c4);
+    color: white;
+    padding: 16px 28px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(101, 71, 165, 0.25);
+    transition: all 0.3s ease;
+}
+
+#overview #registerButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(101, 71, 165, 0.35);
+    background: #503483;
+}
+/* LEARNER PORTAL */
+
+#learnerPortal {
+    padding: 30px;
+    background: var(--cream);
+    min-height: 100vh;
+}
+
+#learnerPortal .panel {
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+#learnerPortal h1 {
+    color: var(--dark);
+    margin-bottom: 15px;
+}
+
+#learnerPortal h2 {
+    color: var(--dark);
+    margin-bottom: 15px;
+}
+
+#learnerPortal p {
+    line-height: 1.7;
+}
+
+#learnerPortal .content-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 25px;
+}
+
+#learnerPortal button {
+    margin-top: 15px;
+}
+
+#learnerPortal .hidden {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    #learnerPortal .content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #learnerPortal {
+        padding: 15px;
+    }
+}

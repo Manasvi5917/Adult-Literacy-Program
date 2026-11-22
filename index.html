@@ -211,8 +211,6 @@
     <nav class="top-nav-links">
         <a href="#overview" class="nav-link active">⌂ Overview</a>
 
-        <a href="#registration" class="nav-link">＋ Register Learner</a>
-
         <a href="#learningProgress" class="nav-link">↗ Learning Progress</a>
 
         <a href="#smartAssistant" class="nav-link">🧠 Smart Assistant</a>
@@ -223,7 +221,7 @@
 
         <a href="#attendanceManagement" class="nav-link">▦ Attendance</a>
 
-        <a href="#progress" class="nav-link">↗ Learning Journey</a>
+       
     </nav>
 
    
@@ -393,9 +391,20 @@
                 </div>
             </div>
 
+               </section>
+ <!-- Daily Quote -->
+        <section class="quote-banner">
+            <span class="quote-icon">“</span>
+            <div>
+                <p id="dailyQuote">
+                    Learning is a journey, and every new word is a step forward.
+                </p>
+                <span>A DAILY REMINDER FROM ADULT LITERACY PROGRAM</span>
+            </div>
         </section>
-  
-        <!-- Attendance Management -->
+    </section> <!-- End of Overview Section -->
+
+        <!-- Attendance Management --> 
 <section class="panel dashboard-section hidden" id="attendanceManagement">
 
     <p class="eyebrow">DAILY RECORD</p>
@@ -522,52 +531,34 @@
 
     <form id="progressForm" class="registration-form">
 
-        <div>
-            <label for="progressLearner">Select Learner</label>
-            <select id="progressLearner" required>
-                <option value="">Choose a learner</option>
-            </select>
-        </div>
+    <div>
+        <label for="progressLearner">Select Learner</label>
+        <select id="progressLearner" required>
+            <option value="">Choose a learner</option>
+        </select>
+    </div>
 
-        <div>
-            <label for="learningSubject">Learning Area</label>
-            <select id="learningSubject" required>
-                <option value="">Choose a subject</option>
-                <option value="Reading">Reading</option>
-                <option value="Writing">Writing</option>
-                <option value="Mathematics">Basic Mathematics</option>
-            </select>
-        </div>
+    <div>
+        <label for="learningSubject">Learning Skill</label>
+        <select id="learningSubject" required>
+            <option value="">Choose a skill</option>
+            <option value="Reading">Reading</option>
+            <option value="Writing">Writing</option>
+            <option value="Mathematics">Basic Mathematics</option>
+        </select>
+    </div>
 
-        <div>
-            <label for="progressPercentage">Progress (%)</label>
-            <input type="number" id="progressPercentage"
-                   min="0" max="100"
-                   placeholder="Enter percentage" required>
-        </div>
+    <div id="quizContainer" class="full-width">
+        <p class="muted">
+            Select a learner and skill to begin the assessment.
+        </p>
+    </div>
 
-        <div>
-            <label for="progressRemark">Learning Remark</label>
-            <select id="progressRemark" required>
-                <option value="">Choose remark</option>
-                <option value="Needs Support">Needs Support</option>
-                <option value="Making Progress">Making Progress</option>
-                <option value="Good Progress">Good Progress</option>
-                <option value="Excellent">Excellent</option>
-            </select>
-        </div>
+    <button type="submit" class="primary-btn" id="submitAssessment">
+        Submit Assessment
+    </button>
 
-        <div class="full-width">
-            <label for="progressNotes">Additional Notes</label>
-            <textarea id="progressNotes"
-                      placeholder="Describe the learner's achievements"></textarea>
-        </div>
-
-        <button type="submit" class="primary-btn">
-            Save Learning Progress
-        </button>
-
-    </form>
+</form>
 
     <div class="table-wrapper">
         <table>
@@ -715,15 +706,7 @@
 
 </section>
 
-        <section class="quote-banner">
-            <span class="quote-icon">“</span>
-            <div>
-                <p id="dailyQuote">
-                    Learning is a journey, and every new word is a step forward.
-                </p>
-                <span>A DAILY REMINDER FROM ADULT LITERACY PROGRAM</span>
-            </div>
-        </section>
+       
 
         <footer>
             <span> Adult Literacy Program</span>
@@ -732,6 +715,63 @@
 
     </main>
 </div>
+<!-- LEARNER PORTAL -->
+<section id="learnerPortal" class="hidden">
+
+    <div class="panel">
+        <p class="eyebrow">LEARNER SPACE</p>
+        <h1>Welcome, <span id="learnerPortalName">Learner</span>!</h1>
+
+        <p>
+            Welcome to your personal learning space.
+            Here you can track your attendance and take learning assessments.
+        </p>
+    </div>
+
+    <div class="content-grid">
+
+        <!-- Attendance -->
+        <div class="panel">
+            <h2>My Attendance</h2>
+            <p id="learnerAttendanceStatus">
+                Your attendance will be recorded automatically when you log in.
+            </p>
+        </div>
+
+        <!-- Assessment -->
+        <div class="panel">
+            <h2>My Learning Assessment</h2>
+            <p>
+                Test your Reading, Writing and Basic Mathematics skills
+                through assessments.
+            </p>
+
+            <button class="primary-btn" id="startLearnerAssessment">
+                Start Assessment
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Assessment Area -->
+    <div class="panel hidden" id="learnerAssessmentArea">
+        <h2>Learning Assessment</h2>
+        <div id="learnerQuizContainer"></div>
+    </div>
+
+    <!-- My Results -->
+    <div class="panel">
+        <h2>My Learning Results</h2>
+        <div id="learnerOwnResults">
+            <p class="muted">Your assessment results will appear here.</p>
+        </div>
+    </div>
+
+    <button class="primary-btn" id="learnerLogoutButton">
+        Logout
+    </button>
+
+</section>
 
 <script src="script.js"></script>
 </body>
