@@ -172,76 +172,85 @@ loginForm.addEventListener("submit", function (event) {
             return;
         }
 
-        // LEARNER LOGIN
-        if (account.role === "learner") {
+     // LEARNER LOGIN
+if (account.role === "learner") {
 
-            // Automatically record attendance
-            let attendance = [];
+    // Automatically record attendance
+    let attendance = [];
 
-            try {
-                attendance = JSON.parse(
-                    localStorage.getItem("literacyAttendance")
-                ) || [];
-            } catch {
-                attendance = [];
+    try {
+        const savedAttendance = JSON.parse(
+            localStorage.getItem("literacyAttendance")
+        );
+
+        attendance = Array.isArray(savedAttendance)
+            ? savedAttendance
+            : [];
+    } catch {
+        attendance = [];
+    }
+
+    const today = new Date().toLocaleDateString("en-CA");
+
+    // Prevent duplicate attendance on the same day
+    const alreadyMarked = attendance.some(function (record) {
+        return record.username === account.username
+            && record.date === today;
+    });
+
+    if (!alreadyMarked) {
+        attendance.push({
+            name: account.name,
+            username: account.username,
+            date: today,
+            time: new Date().toLocaleTimeString(),
+            status: "Present"
+        });
+
+        localStorage.setItem(
+            "literacyAttendance",
+            JSON.stringify(attendance)
+        );
+    }
+
+    // Store logged-in learner
+    localStorage.setItem(
+        "currentLearner",
+        JSON.stringify(account)
+    );
+
+    loginMessage.style.color = "green";
+    loginMessage.textContent = "Login successful!";
+
+    setTimeout(function () {
+
+        loginPage.classList.add("hidden");
+        signupPage.classList.add("hidden");
+        learnerPortal.classList.add("hidden");
+
+        dashboardPage.classList.remove("hidden");
+setDashboardRole("learner");
+
+        // Display the shared dashboard
+        showSection("overview");
+
+        // Set dashboard name for learner
+        const profileName = document.querySelector("#dashboardPage .topbar");
+
+        if (profileName) {
+            const heading = profileName.querySelector("h1");
+
+            if (heading) {
+                heading.textContent = "Welcome, " + account.name + "!";
             }
-
-            const today = new Date().toLocaleDateString("en-CA");
-
-            // Prevent duplicate attendance on the same day
-            const alreadyMarked = attendance.some(function (record) {
-                return record.username === account.username
-                    && record.date === today;
-            });
-
-            if (!alreadyMarked) {
-                attendance.push({
-                    name: account.name,
-                    username: account.username,
-                    date: today,
-                    time: new Date().toLocaleTimeString(),
-                    status: "Present"
-                });
-
-                localStorage.setItem(
-                    "literacyAttendance",
-                    JSON.stringify(attendance)
-                );
-            }
-
-            // Store logged-in learner
-            localStorage.setItem(
-                "currentLearner",
-                JSON.stringify(account)
-            );
-
-            loginMessage.style.color = "green";
-            loginMessage.textContent = "Login successful!";
-
-            setTimeout(function () {
-                loginPage.classList.add("hidden");
-                signupPage.classList.add("hidden");
-                dashboardPage.classList.add("hidden");
-
-                const learnerPortal =
-                    document.getElementById("learnerPortal");
-
-                learnerPortal.classList.remove("hidden");
-
-                document.getElementById("learnerPortalName").textContent =
-                    account.name;
-                    
-                    renderLearnerOwnResults();
-
-                document.getElementById("learnerAttendanceStatus").textContent =
-                    alreadyMarked
-                    ? "Your attendance has already been recorded today."
-                    : "Your attendance has been automatically recorded as Present today.";
-
-            }, 500);
-
-            return;
         }
+
+        renderLearnerOwnResults();
+
+    }, 500);
+
+    return;
+}
 
         // TEACHER / VOLUNTEER RESTRICTION
         loginMessage.style.color = "red";
@@ -265,6 +274,7 @@ function getLearners() {
 
 // Display dashboard statistics
 function showDashboard() {
+    setDashboardRole("admin");
     const learners = getLearners();
 
     // Demo attendance figures until attendance management is implemented.
@@ -305,23 +315,95 @@ function showDashboard() {
 
 function showSection(sectionId) {
 
+    const learner = getLoggedInLearner();
+
     // Hide all dashboard sections
     document.querySelectorAll("#dashboardPage .dashboard-section")
         .forEach(function (section) {
             section.classList.add("hidden");
         });
 
-    // Show the selected section
     const section = document.getElementById(sectionId);
 
-    if (section) {
-        section.classList.remove("hidden");
+    if (!section) return;
 
-        section.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
+    section.classList.remove("hidden");
+
+    // LEARNER: Show only personal attendance
+    if (learner && sectionId === "attendanceManagement") {
+
+        const adminElements = section.querySelectorAll(
+            ".attendance-controls, .table-wrapper, #saveAttendance, #attendanceMessage"
+        );
+
+        adminElements.forEach(function (element) {
+            element.style.display = "none";
         });
+
+        let personalAttendance = document.getElementById("personalAttendanceView");
+
+        if (!personalAttendance) {
+            personalAttendance = document.createElement("div");
+            personalAttendance.id = "personalAttendanceView";
+            section.appendChild(personalAttendance);
+        }
+
+        let records = [];
+
+        try {
+            records = JSON.parse(localStorage.getItem("literacyAttendance")) || [];
+        } catch {
+            records = [];
+        }
+
+        if (!Array.isArray(records)) {
+            records = [];
+        }
+
+        const myRecords = records.filter(function (record) {
+            return record.username === learner.username;
+        });
+
+        personalAttendance.innerHTML = `
+            <h2>My Attendance</h2>
+            <p>Here is your personal attendance record.</p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${
+                            myRecords.length === 0
+                            ? `<tr><td colspan="3">No attendance records found.</td></tr>`
+                            : myRecords.map(record => `
+                                <tr>
+                                    <td>${escapeProfileText(record.date || "-")}</td>
+                                    <td>${escapeProfileText(record.time || "-")}</td>
+                                    <td>${escapeProfileText(record.status || "-")}</td>
+                                </tr>
+                            `).join("")
+                        }
+                    </tbody>
+                </table>
+            </div>
+        `;
     }
+
+    // ADMIN: Refresh all learners' progress
+    if (!learner && sectionId === "learningProgress") {
+        displayProgress();
+    }
+
+    section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 }
 
 // Navigation links
@@ -828,42 +910,49 @@ function getProgressRemark(percentage) {
     return "Excellent";
 }
 
-// Display saved progress
+// Display learner assessment progress for Admin
 function displayProgress() {
 
-    const learners = getLearners();
-    const records = getProgressRecords();
+    let assessmentRecords = [];
+
+    try {
+        assessmentRecords = JSON.parse(
+            localStorage.getItem("literacyLearnerAssessments")
+        ) || [];
+    } catch {
+        assessmentRecords = [];
+    }
+
     const table = document.getElementById("progressTable");
 
     table.replaceChildren();
 
-    if (records.length === 0) {
+    if (assessmentRecords.length === 0) {
 
         const row = document.createElement("tr");
         const cell = document.createElement("td");
 
         cell.colSpan = 4;
-        cell.textContent = "No learning progress recorded yet.";
+        cell.textContent = "No learner assessments submitted yet.";
 
         row.appendChild(cell);
         table.appendChild(row);
         return;
     }
 
-    records.forEach(function (record) {
+    assessmentRecords.forEach(function (record) {
 
         const row = document.createElement("tr");
 
         // Learner name
         const learnerCell = document.createElement("td");
-        learnerCell.textContent =
-            learners[record.learnerIndex]?.name || "Learner unavailable";
+        learnerCell.textContent = record.name || "Learner";
 
         // Subject
         const subjectCell = document.createElement("td");
         subjectCell.textContent = record.subject;
 
-        // Percentage
+        // Percentage progress bar
         const progressCell = document.createElement("td");
 
         const bar = document.createElement("div");
@@ -881,12 +970,14 @@ function displayProgress() {
 
         progressCell.append(bar, value);
 
-        // Remark
+        // Score and date
         const remarkCell = document.createElement("td");
 
         const remark = document.createElement("span");
         remark.className = "progress-remark";
-        remark.textContent = record.remark;
+        remark.textContent =
+            record.score + "/" + record.totalQuestions +
+            " | " + record.date;
 
         remarkCell.appendChild(remark);
 
@@ -1690,255 +1781,608 @@ document.getElementById("learnerLogoutButton").addEventListener("click", functio
 });
 // LEARNER SELF-ASSESSMENT
 
+// Randomized Progressive Assessment Question Bank
 const learnerQuestions = {
-    Reading: [
-        {
-            question: "Which word means the opposite of 'big'?",
-            options: ["Small", "Tall", "Wide", "Long"],
-            answer: "Small"
-        },
-        {
-            question: "Which word is a fruit?",
-            options: ["Chair", "Apple", "Book", "Table"],
-            answer: "Apple"
-        },
-        {
-            question: "Complete the sentence: The sun ___ in the sky.",
-            options: ["sleep", "run", "shines", "eat"],
-            answer: "shines"
-        },
-        {
-            question: "Which word is spelled correctly?",
-            options: ["Frend", "Freind", "Friend", "Friedn"],
-            answer: "Friend"
-        },
-        {
-            question: "What do we use to read a story?",
-            options: ["Book", "Spoon", "Shoes", "Cup"],
-            answer: "Book"
-        }
-    ],
 
-    Writing: [
-        {
-            question: "Which sentence is correct?",
-            options: [
-                "i am happy.",
-                "I am happy.",
-                "i Am happy.",
-                "I am happy"
-            ],
-            answer: "I am happy."
-        },
-        {
-            question: "Which punctuation mark ends a question?",
-            options: [".", ",", "?", "!"],
-            answer: "?"
-        },
-        {
-            question: "Which word is spelled correctly?",
-            options: ["School", "Skool", "Scool", "Shcool"],
-            answer: "School"
-        },
-        {
-            question: "Choose the correct spelling.",
-            options: ["Market", "Markit", "Marcket", "Maket"],
-            answer: "Market"
-        },
-        {
-            question: "Which is a complete sentence?",
-            options: [
-                "Playing outside",
-                "The boy runs.",
-                "On the table",
-                "Very beautiful"
-            ],
-            answer: "The boy runs."
-        }
-    ],
+    Reading: {
 
-    Mathematics: [
-        {
-            question: "What is 5 + 3?",
-            options: ["6", "7", "8", "9"],
-            answer: "8"
-        },
-        {
-            question: "What is 10 - 4?",
-            options: ["5", "6", "7", "8"],
-            answer: "6"
-        },
-        {
-            question: "What is 3 × 4?",
-            options: ["7", "12", "10", "14"],
-            answer: "12"
-        },
-        {
-            question: "What is 20 ÷ 5?",
-            options: ["2", "3", "4", "5"],
-            answer: "4"
-        },
-        {
-            question: "Which number is the largest?",
-            options: ["15", "25", "10", "20"],
-            answer: "25"
-        }
-    ]
+        // LEVEL 1 - EASY
+        1: [
+            {
+                question: "Which word means the opposite of 'hot'?",
+                options: ["Cold", "Warm", "Heat", "Fire"],
+                answer: "Cold"
+            },
+            {
+                question: "Which word is a fruit?",
+                options: ["Chair", "Apple", "Book", "Table"],
+                answer: "Apple"
+            },
+            {
+                question: "Complete the sentence: The sun ___ brightly.",
+                options: ["sleep", "shines", "eat", "walk"],
+                answer: "shines"
+            },
+            {
+                question: "Which word is spelled correctly?",
+                options: ["Frend", "Freind", "Friend", "Friedn"],
+                answer: "Friend"
+            },
+            {
+                question: "What do we use to read a story?",
+                options: ["Book", "Spoon", "Shoes", "Cup"],
+                answer: "Book"
+            }
+        ],
+
+        // LEVEL 2 - MEDIUM
+        2: [
+            {
+                question: "What is the main purpose of a newspaper?",
+                options: [
+                    "To provide news and information",
+                    "To cook food",
+                    "To wash clothes",
+                    "To repair vehicles"
+                ],
+                answer: "To provide news and information"
+            },
+            {
+                question: "Choose the correct meaning of 'honest'.",
+                options: [
+                    "Someone who tells the truth",
+                    "Someone who sleeps",
+                    "Someone who runs",
+                    "Someone who shouts"
+                ],
+                answer: "Someone who tells the truth"
+            },
+            {
+                question: "Complete the sentence: She ___ to work every day.",
+                options: ["go", "going", "goes", "gone"],
+                answer: "goes"
+            },
+            {
+                question: "Which word means 'very tired'?",
+                options: ["Energetic", "Exhausted", "Happy", "Excited"],
+                answer: "Exhausted"
+            },
+            {
+                question: "What is the main idea of a paragraph?",
+                options: [
+                    "The central message",
+                    "The longest word",
+                    "The last letter",
+                    "The punctuation"
+                ],
+                answer: "The central message"
+            }
+        ],
+
+        // LEVEL 3 - HARD
+        3: [
+            {
+                question: "What does the phrase 'a piece of cake' mean?",
+                options: [
+                    "Something very easy",
+                    "Something very expensive",
+                    "Something very difficult",
+                    "Something very sweet"
+                ],
+                answer: "Something very easy"
+            },
+            {
+                question: "Choose the grammatically correct sentence.",
+                options: [
+                    "She have completed her work.",
+                    "She has completed her work.",
+                    "She completing her work.",
+                    "She complete her work yesterday."
+                ],
+                answer: "She has completed her work."
+            },
+            {
+                question: "Why is a conclusion written at the end of a passage?",
+                options: [
+                    "To summarize the main points",
+                    "To introduce a new title",
+                    "To list random words",
+                    "To repeat every sentence"
+                ],
+                answer: "To summarize the main points"
+            },
+            {
+                question: "Choose the synonym of 'rapid'.",
+                options: ["Slow", "Fast", "Weak", "Quiet"],
+                answer: "Fast"
+            },
+            {
+                question: "What can we infer when a person carries an umbrella and wears a raincoat?",
+                options: [
+                    "It may be raining",
+                    "It is very sunny",
+                    "The person is cooking",
+                    "The person is sleeping"
+                ],
+                answer: "It may be raining"
+            }
+        ]
+    },
+
+    Writing: {
+
+        // LEVEL 1 - EASY
+        1: [
+            {
+                question: "Which sentence is correct?",
+                options: [
+                    "i am happy.",
+                    "I am happy.",
+                    "i Am happy.",
+                    "I am happy"
+                ],
+                answer: "I am happy."
+            },
+            {
+                question: "Which punctuation mark ends a question?",
+                options: [".", ",", "?", "!"],
+                answer: "?"
+            },
+            {
+                question: "Which word is spelled correctly?",
+                options: ["School", "Skool", "Scool", "Shcool"],
+                answer: "School"
+            },
+            {
+                question: "Choose the correct spelling.",
+                options: ["Market", "Markit", "Marcket", "Maket"],
+                answer: "Market"
+            },
+            {
+                question: "Which is a complete sentence?",
+                options: [
+                    "Playing outside",
+                    "The boy runs.",
+                    "On the table",
+                    "Very beautiful"
+                ],
+                answer: "The boy runs."
+            }
+        ],
+
+        // LEVEL 2 - MEDIUM
+        2: [
+            {
+                question: "Choose the correctly punctuated sentence.",
+                options: [
+                    "Where are you going.",
+                    "Where are you going?",
+                    "where are you going!",
+                    "Where are you going,"
+                ],
+                answer: "Where are you going?"
+            },
+            {
+                question: "Fill in the blank: I ___ my homework yesterday.",
+                options: ["complete", "completed", "completing", "completes"],
+                answer: "completed"
+            },
+            {
+                question: "Which word connects two ideas?",
+                options: ["And", "Table", "Quickly", "Chair"],
+                answer: "And"
+            },
+            {
+                question: "Which sentence is written correctly?",
+                options: [
+                    "My brother live in Puttur.",
+                    "My brother lives in Puttur.",
+                    "My brother living Puttur.",
+                    "My brother lives Puttur yesterday."
+                ],
+                answer: "My brother lives in Puttur."
+            },
+            {
+                question: "Which is the correct beginning of a formal letter?",
+                options: [
+                    "Dear Sir or Madam,",
+                    "Hey buddy!",
+                    "What's up?",
+                    "Hi dude!"
+                ],
+                answer: "Dear Sir or Madam,"
+            }
+        ],
+
+        // LEVEL 3 - HARD
+        3: [
+            {
+                question: "Which sentence is best suited for a formal application?",
+                options: [
+                    "I wanna take leave.",
+                    "Please grant me leave for two days.",
+                    "Give me two days off.",
+                    "Hey, I won't come."
+                ],
+                answer: "Please grant me leave for two days."
+            },
+            {
+                question: "Choose the correctly written sentence.",
+                options: [
+                    "Although it was raining, we went outside.",
+                    "Although it was raining we went outside",
+                    "Although, it was raining we went outside.",
+                    "although it was raining, we went outside."
+                ],
+                answer: "Although it was raining, we went outside."
+            },
+            {
+                question: "Which word is a synonym of 'improve'?",
+                options: ["Worsen", "Enhance", "Destroy", "Ignore"],
+                answer: "Enhance"
+            },
+            {
+                question: "Which sentence uses the apostrophe correctly?",
+                options: [
+                    "The students books are here.",
+                    "The student's book is here.",
+                    "The students's book is here.",
+                    "The student book's is here."
+                ],
+                answer: "The student's book is here."
+            },
+            {
+                question: "Which is the best way to organize a paragraph?",
+                options: [
+                    "Main idea, supporting details, conclusion",
+                    "Random sentences",
+                    "Only a title",
+                    "Repeated words"
+                ],
+                answer: "Main idea, supporting details, conclusion"
+            }
+        ]
+    },
+
+    Mathematics: {
+
+        // LEVEL 1 - EASY
+        1: [
+            {
+                question: "What is 5 + 3?",
+                options: ["6", "7", "8", "9"],
+                answer: "8"
+            },
+            {
+                question: "What is 10 - 4?",
+                options: ["5", "6", "7", "8"],
+                answer: "6"
+            },
+            {
+                question: "What is 3 × 4?",
+                options: ["7", "12", "10", "14"],
+                answer: "12"
+            },
+            {
+                question: "What is 20 ÷ 5?",
+                options: ["2", "3", "4", "5"],
+                answer: "4"
+            },
+            {
+                question: "Which number is the largest?",
+                options: ["15", "25", "10", "20"],
+                answer: "25"
+            }
+        ],
+
+        // LEVEL 2 - MEDIUM
+        2: [
+            {
+                question: "What is 125 + 75?",
+                options: ["150", "200", "175", "250"],
+                answer: "200"
+            },
+            {
+                question: "What is 15 × 6?",
+                options: ["80", "90", "75", "85"],
+                answer: "90"
+            },
+            {
+                question: "A shirt costs ₹500. You get ₹100 off. What is the final price?",
+                options: ["₹400", "₹450", "₹300", "₹600"],
+                answer: "₹400"
+            },
+            {
+                question: "What is 144 ÷ 12?",
+                options: ["10", "11", "12", "14"],
+                answer: "12"
+            },
+            {
+                question: "What is half of 250?",
+                options: ["100", "125", "150", "200"],
+                answer: "125"
+            }
+        ],
+
+        // LEVEL 3 - HARD
+        3: [
+            {
+                question: "What is 25% of 800?",
+                options: ["100", "200", "250", "400"],
+                answer: "200"
+            },
+            {
+                question: "A person buys 3 items for ₹150 each. What is the total cost?",
+                options: ["₹300", "₹350", "₹450", "₹500"],
+                answer: "₹450"
+            },
+            {
+                question: "If 5 notebooks cost ₹100, how much do 8 notebooks cost?",
+                options: ["₹120", "₹160", "₹180", "₹200"],
+                answer: "₹160"
+            },
+            {
+                question: "What is 3/4 of 200?",
+                options: ["100", "125", "150", "175"],
+                answer: "150"
+            },
+            {
+                question: "A bus travels 120 km in 3 hours. What is its average speed?",
+                options: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"],
+                answer: "40 km/h"
+            }
+        ]
+    }
 };
 
 
-// Open assessment area
-document.getElementById("startLearnerAssessment").addEventListener("click", function () {
+// Open progressive randomized assessment
+document.getElementById("startLearnerAssessment")
+    ?.addEventListener("click", function () {
 
-    const assessmentArea = document.getElementById("learnerAssessmentArea");
-    const quizContainer = document.getElementById("learnerQuizContainer");
+        const assessmentArea = document.getElementById("learnerAssessmentArea");
+        const quizContainer = document.getElementById("learnerQuizContainer");
 
-    assessmentArea.classList.remove("hidden");
+        if (!assessmentArea || !quizContainer) return;
 
-    quizContainer.innerHTML = `
-        <label for="learnerSubject">Choose a learning skill</label>
+        assessmentArea.classList.remove("hidden");
 
-        <select id="learnerSubject">
-            <option value="">Select a subject</option>
-            <option value="Reading">Reading</option>
-            <option value="Writing">Writing</option>
-            <option value="Mathematics">Basic Mathematics</option>
-        </select>
+        quizContainer.innerHTML = `
+            <label for="learnerSubject">Choose a learning skill</label>
 
-        <div id="learnerQuestionsArea"></div>
-    `;
+            <select id="learnerSubject">
+                <option value="">Select a subject</option>
+                <option value="Reading">Reading</option>
+                <option value="Writing">Writing</option>
+                <option value="Mathematics">Basic Mathematics</option>
+            </select>
 
-    assessmentArea.scrollIntoView({
-        behavior: "smooth"
-    });
-
-    document.getElementById("learnerSubject").addEventListener("change", function () {
-
-        const subject = this.value;
-        const questionsArea = document.getElementById("learnerQuestionsArea");
-
-        if (!subject) {
-            questionsArea.innerHTML = "";
-            return;
-        }
-
-        const questions = learnerQuestions[subject];
-
-        let html = `<form id="learnerAssessmentForm">`;
-
-        questions.forEach(function (q, index) {
-
-            html += `
-                <div class="panel">
-                    <h3>Question ${index + 1}</h3>
-                    <p>${q.question}</p>
-            `;
-
-            q.options.forEach(function (option) {
-
-                html += `
-                    <label style="display:block; margin:10px 0;">
-                        <input type="radio"
-                            name="question${index}"
-                            value="${option}"
-                            required>
-                        ${option}
-                    </label>
-                `;
-
-            });
-
-            html += `</div>`;
-
-        });
-
-        html += `
-            <button type="submit" class="primary-btn">
-                Submit Assessment
-            </button>
-        </form>
-        <p id="learnerAssessmentMessage"></p>
+            <div id="learnerQuestionsArea"></div>
         `;
 
-        questionsArea.innerHTML = html;
+        assessmentArea.scrollIntoView({ behavior: "smooth" });
 
+        document.getElementById("learnerSubject")
+            .addEventListener("change", function () {
 
-        // Submit assessment
-        document.getElementById("learnerAssessmentForm").addEventListener("submit", function (event) {
+                const subject = this.value;
+                const questionsArea =
+                    document.getElementById("learnerQuestionsArea");
 
-            event.preventDefault();
-
-            const currentLearner = JSON.parse(
-                localStorage.getItem("currentLearner")
-            );
-
-            if (!currentLearner) {
-                alert("Please log in again.");
-                return;
-            }
-
-            let score = 0;
-
-            questions.forEach(function (q, index) {
-
-                const selected = document.querySelector(
-                    `input[name="question${index}"]:checked`
-                );
-
-                if (selected && selected.value === q.answer) {
-                    score++;
+                if (!subject) {
+                    questionsArea.innerHTML = "";
+                    return;
                 }
 
+                const currentLearner = JSON.parse(
+                    localStorage.getItem("currentLearner") || "null"
+                );
+
+                if (!currentLearner) {
+                    questionsArea.innerHTML =
+                        "<p>Please log in again.</p>";
+                    return;
+                }
+
+                // Load saved learner levels
+                let savedLevels = {};
+
+                try {
+                    savedLevels = JSON.parse(
+                        localStorage.getItem("literacyAssessmentLevels")
+                    ) || {};
+                } catch {
+                    savedLevels = {};
+                }
+
+                const username = currentLearner.username;
+
+                if (!savedLevels[username]) {
+                    savedLevels[username] = {};
+                }
+
+                const level = savedLevels[username][subject] || 1;
+
+                // Get questions for the current level
+                const questionBank = learnerQuestions[subject][level];
+
+                // Shuffle questions
+                const shuffledQuestions = [...questionBank]
+                    .sort(() => Math.random() - 0.5);
+
+                // Shuffle answer options
+                shuffledQuestions.forEach(function (q) {
+                    q.options = [...q.options]
+                        .sort(() => Math.random() - 0.5);
+                });
+
+                let html = `
+                    <div class="panel" style="margin-top:20px;">
+                        <h3>Level ${level} - ${
+                            level === 1 ? "Easy" :
+                            level === 2 ? "Medium" : "Hard"
+                        }</h3>
+
+                        <p>Pass this level to unlock the next level.</p>
+
+                        <form id="learnerAssessmentForm">
+                `;
+
+                shuffledQuestions.forEach(function (q, index) {
+
+                    html += `
+                        <div class="panel" style="margin-top:15px;">
+                            <h3>Question ${index + 1}</h3>
+                            <p>${escapeProfileText(q.question)}</p>
+                    `;
+
+                    q.options.forEach(function (option) {
+
+                        html += `
+                            <label style="display:block; margin:10px 0;">
+                                <input type="radio"
+                                    name="question${index}"
+                                    value="${escapeProfileText(option)}"
+                                    required>
+                                ${escapeProfileText(option)}
+                            </label>
+                        `;
+                    });
+
+                    html += `</div>`;
+                });
+
+                html += `
+                        <button type="submit" class="primary-btn">
+                            Submit Assessment
+                        </button>
+                    </form>
+
+                    <p id="learnerAssessmentMessage"></p>
+                    </div>
+                `;
+
+                questionsArea.innerHTML = html;
+
+                // Submit assessment
+                document.getElementById("learnerAssessmentForm")
+                    .addEventListener("submit", function (event) {
+
+                        event.preventDefault();
+
+                        let score = 0;
+
+                        shuffledQuestions.forEach(function (q, index) {
+
+                            const selected = document.querySelector(
+                                `input[name="question${index}"]:checked`
+                            );
+
+                            if (selected &&
+                                selected.value === q.answer) {
+                                score++;
+                            }
+                        });
+
+                        const percentage = Math.round(
+                            (score / shuffledQuestions.length) * 100
+                        );
+
+                        // Pass mark: 60%
+                        const passed = percentage >= 60;
+
+                        // Unlock next level after passing
+                        if (passed && level < 3) {
+                            savedLevels[username][subject] = level + 1;
+                        } else {
+                            savedLevels[username][subject] = level;
+                        }
+
+                        localStorage.setItem(
+                            "literacyAssessmentLevels",
+                            JSON.stringify(savedLevels)
+                        );
+
+                        // Save result
+                        const result = {
+                            name: currentLearner.name,
+                            username: username,
+                            subject: subject,
+                            level: level,
+                            score: score,
+                            totalQuestions: shuffledQuestions.length,
+                            percentage: percentage,
+                            date: new Date().toLocaleDateString("en-CA"),
+                            time: new Date().toLocaleTimeString()
+                        };
+
+                        let savedResults = [];
+
+                        try {
+                            savedResults = JSON.parse(
+                                localStorage.getItem(
+                                    "literacyLearnerAssessments"
+                                )
+                            ) || [];
+                        } catch {
+                            savedResults = [];
+                        }
+
+                        if (!Array.isArray(savedResults)) {
+                            savedResults = [];
+                        }
+
+                        savedResults.push(result);
+
+                        localStorage.setItem(
+                            "literacyLearnerAssessments",
+                            JSON.stringify(savedResults)
+                        );
+
+                        // Show result
+                        let message = `
+                            <div class="panel" style="margin-top:20px;">
+                                <h3>Assessment Completed!</h3>
+                                <p>Level: ${level}</p>
+                                <p>Score: ${score} / ${shuffledQuestions.length}</p>
+                                <p>Percentage: ${percentage}%</p>
+                        `;
+
+                        if (passed && level < 3) {
+                            message += `
+                                <h3>🎉 Congratulations!</h3>
+                                <p>You passed Level ${level}!</p>
+                                <p>Level ${level + 1} is now unlocked.</p>
+                            `;
+                        } else if (passed && level === 3) {
+                            message += `
+                                <h3>🏆 Excellent!</h3>
+                                <p>You completed all 3 levels!</p>
+                            `;
+                        } else {
+                            message += `
+                                <p>You need at least 60% to pass.</p>
+                                <p>Try again to improve your score!</p>
+                            `;
+                        }
+
+                        message += `</div>`;
+
+                        document.getElementById(
+                            "learnerAssessmentMessage"
+                        ).innerHTML = message;
+
+                        if (typeof renderLearnerOwnResults === "function") {
+                            renderLearnerOwnResults();
+                        }
+
+                        this.querySelector(
+                            "button[type='submit']"
+                        ).disabled = true;
+
+                    });
             });
-
-            const percentage = Math.round(
-                (score / questions.length) * 100
-            );
-
-            const result = {
-                name: currentLearner.name,
-                username: currentLearner.username,
-                subject: subject,
-                score: score,
-                totalQuestions: questions.length,
-                percentage: percentage,
-                date: new Date().toLocaleDateString("en-CA"),
-                time: new Date().toLocaleTimeString()
-            };
-
-            let savedResults = [];
-
-            try {
-                savedResults = JSON.parse(
-                    localStorage.getItem("literacyLearnerAssessments")
-                ) || [];
-            } catch {
-                savedResults = [];
-            }
-
-            savedResults.push(result);
-
-            localStorage.setItem(
-                "literacyLearnerAssessments",
-                JSON.stringify(savedResults)
-            );
-
-            document.getElementById("learnerAssessmentMessage").innerHTML = `
-                <h3>Assessment Completed!</h3>
-                <p>Your Score: ${score} / ${questions.length}</p>
-                <p>Your Percentage: ${percentage}%</p>
-                <p>Subject: ${subject}</p>
-            `;
-
-            renderLearnerOwnResults();
-
-            this.querySelector("button[type='submit']").disabled = true;
-
-        });
-
     });
-
-});
 
 
 // Display only the currently logged-in learner's results
@@ -1988,3 +2432,660 @@ function renderLearnerOwnResults() {
     }).join("");
 
 }
+// SHARED DASHBOARD ROLE CONTROL
+function setDashboardRole(role) {
+
+    const isLearner = role === "learner";
+
+    // Switch Overview content
+    document.getElementById("adminHero")
+        .classList.toggle("hidden", isLearner);
+
+    document.getElementById("adminStats")
+        .classList.toggle("hidden", isLearner);
+
+    document.getElementById("adminOverviewContent")
+        .classList.toggle("hidden", isLearner);
+
+    document.getElementById("learnerHero")
+        .classList.toggle("hidden", !isLearner);
+
+    document.getElementById("learnerOverviewContent")
+        .classList.toggle("hidden", !isLearner);
+
+    document.getElementById("overviewQuote")
+        .classList.toggle("hidden", isLearner);
+
+    // Update heading and profile
+    if (isLearner) {
+
+        let learner = {};
+
+        try {
+            learner = JSON.parse(
+                localStorage.getItem("currentLearner")
+            ) || {};
+        } catch {
+            learner = {};
+        }
+
+        document.getElementById("overviewHeading").textContent =
+            "Welcome, " + (learner.name || "Learner") + "!";
+
+        document.getElementById("overviewEyebrow").textContent =
+            "YOUR LEARNING DASHBOARD";
+
+        document.getElementById("overviewSubtitle").textContent =
+            "Keep learning and growing every day.";
+
+        document.getElementById("overviewProfileName").textContent =
+            learner.name || "Learner";
+
+        document.getElementById("overviewProfileRole").textContent =
+            "Learner";
+
+        document.getElementById("overviewAvatar").textContent =
+            (learner.name || "L").charAt(0).toUpperCase();
+
+        // Show learner's personal attendance
+        const attendance = JSON.parse(
+            localStorage.getItem("literacyAttendance") || "[]"
+        );
+
+        const today = new Date().toLocaleDateString("en-CA");
+
+        const todayRecord = Array.isArray(attendance)
+            ? attendance.find(function (record) {
+                return record.username === learner.username
+                    && record.date === today;
+            })
+            : null;
+
+        document.getElementById("learnerOverviewAttendance")
+            .textContent = todayRecord
+            ? "You are marked Present today. Attendance was recorded automatically."
+            : "No attendance record found for today.";
+
+    } else {
+
+        document.getElementById("overviewHeading").textContent =
+            "Your learning community.";
+
+        document.getElementById("overviewEyebrow").textContent =
+            "ADULT EDUCATION MANAGEMENT";
+
+        document.getElementById("overviewSubtitle").textContent =
+            "A little progress each day adds up to big results.";
+
+        document.getElementById("overviewProfileName").textContent =
+            "Administrator";
+
+        document.getElementById("overviewProfileRole").textContent =
+            "Program Coordinator";
+
+        document.getElementById("overviewAvatar").textContent = "A";
+    }
+
+    // Hide Admin-only sections for learners
+    const adminSections = [
+        "registration",
+        "learners",
+        "attendanceManagement"
+    ];
+
+    adminSections.forEach(function (id) {
+        const section = document.getElementById(id);
+
+        if (section) {
+            section.classList.toggle("hidden", isLearner);
+        }
+    });
+
+    // Hide Admin-only navigation
+    const adminNavigation = [
+        "registerNav",
+        "learnersNav",
+        "attendanceNav"
+    ];
+
+    adminNavigation.forEach(function (id) {
+        const nav = document.getElementById(id);
+
+        if (nav) {
+            nav.classList.toggle("hidden", isLearner);
+        }
+    });
+
+    // Hide the Attendance navigation for learners
+    const attendanceNav = document.getElementById("attendanceNav");
+
+    if (attendanceNav) {
+        attendanceNav.classList.toggle("hidden", isLearner);
+    }
+}
+
+    // ======================================
+// PERSONAL DATA FILTER FOR LEARNER MODE
+// ======================================
+
+const adminSmartAssistantFunction = analyzeLearningProgress;
+const adminProfileFunction = displayLearnerProfile;
+const adminAchievementsFunction = displayAchievements;
+
+
+// Get logged-in learner
+function getLoggedInLearner() {
+    try {
+        return JSON.parse(localStorage.getItem("currentLearner"));
+    } catch {
+        return null;
+    }
+}
+
+
+// Get self-assessment records belonging to one learner
+function getMyAssessmentRecords() {
+    const learner = getLoggedInLearner();
+
+    if (!learner) return [];
+
+    try {
+        const records = JSON.parse(
+            localStorage.getItem("literacyLearnerAssessments")
+        ) || [];
+
+        return Array.isArray(records)
+            ? records.filter(function (record) {
+                return record.username === learner.username;
+            })
+            : [];
+    } catch {
+        return [];
+    }
+}
+
+
+// SMART ASSISTANT
+analyzeLearningProgress = function () {
+
+    const learner = getLoggedInLearner();
+
+    // Admin continues using the original function
+    if (!learner) {
+        adminSmartAssistantFunction();
+        return;
+    }
+
+    const records = getMyAssessmentRecords();
+    const container = document.getElementById("smartLearnerResults");
+
+    if (!container) return;
+
+    container.replaceChildren();
+
+    document.getElementById("smartTotal").textContent =
+        records.length ? "1" : "0";
+
+    const average = records.length
+        ? Math.round(
+            records.reduce(function (sum, record) {
+                return sum + Number(record.percentage || 0);
+            }, 0) / records.length
+        )
+        : 0;
+
+    document.getElementById("smartSupport").textContent =
+        records.length && average < 40 ? "1" : "0";
+
+    document.getElementById("smartGoodProgress").textContent =
+        records.length && average >= 70 ? "1" : "0";
+
+    if (records.length === 0) {
+        const message = document.createElement("p");
+
+        message.textContent =
+            "Complete your assessments to receive your personal learning suggestions.";
+
+        container.appendChild(message);
+        return;
+    }
+
+    records.forEach(function (record) {
+
+        const card = document.createElement("div");
+        card.className = "smart-learner-card";
+
+        const heading = document.createElement("h4");
+        heading.textContent = record.subject;
+
+        const score = document.createElement("p");
+        score.textContent =
+            "Your progress: " + record.percentage + "%";
+
+        const suggestion = document.createElement("p");
+
+        if (record.percentage < 40) {
+            suggestion.textContent =
+                "Suggestion: Practise this subject regularly and take your time.";
+        } else if (record.percentage < 70) {
+            suggestion.textContent =
+                "Suggestion: Keep practising to improve your skills.";
+        } else {
+            suggestion.textContent =
+                "Suggestion: Great work! Continue learning new skills.";
+        }
+
+        card.append(heading, score, suggestion);
+        container.appendChild(card);
+    });
+};
+
+
+// LEARNER PROFILE
+displayLearnerProfile = function () {
+
+    const learner = getLoggedInLearner();
+
+    // Admin uses the original profile display
+    if (!learner) {
+        adminProfileFunction();
+        return;
+    }
+
+    const container = document.getElementById("learnerProfileDetails");
+
+    if (!container) return;
+
+    // Hide learner selection controls
+    const select = document.getElementById("profileLearnerSelect");
+    const button = document.getElementById("viewProfileBtn");
+
+    if (select) select.style.display = "none";
+    if (button) button.style.display = "none";
+
+    const records = getMyAssessmentRecords();
+
+    let attendance = [];
+
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem("literacyAttendance")
+        );
+
+        if (Array.isArray(saved)) {
+            attendance = saved.filter(function (record) {
+                return record.username === learner.username;
+            });
+        }
+    } catch {
+        attendance = [];
+    }
+
+    const present = attendance.filter(function (record) {
+        return record.status === "Present";
+    }).length;
+
+    const percentage = attendance.length
+        ? Math.round((present / attendance.length) * 100)
+        : 0;
+
+    let progressHTML = "";
+
+    if (records.length) {
+        progressHTML = records.map(function (record) {
+            return `
+                <div class="profile-progress-item">
+                    <strong>${escapeProfileText(record.subject)}</strong>
+                    <span>${record.percentage}%</span>
+                    <p>Score: ${record.score}/${record.totalQuestions}</p>
+                    <p>Date: ${escapeProfileText(record.date)}</p>
+                </div>
+            `;
+        }).join("");
+    } else {
+        progressHTML = "<p>You have not completed any assessments yet.</p>";
+    }
+
+    container.innerHTML = `
+        <div class="profile-card">
+            <h3>👤 My Personal Information</h3>
+
+            <p><strong>Name:</strong> ${escapeProfileText(learner.name || "")}</p>
+            <p><strong>Username:</strong> ${escapeProfileText(learner.username || "")}</p>
+            <p><strong>Email:</strong> ${escapeProfileText(learner.email || "")}</p>
+            <p><strong>Role:</strong> Learner</p>
+        </div>
+
+        <div class="profile-card">
+            <h3>📅 My Attendance</h3>
+            <p>Recorded attendance: ${attendance.length}</p>
+            <p>Present: ${present}</p>
+            <p>Attendance percentage: ${percentage}%</p>
+        </div>
+
+        <div class="profile-card">
+            <h3>📚 My Learning Progress</h3>
+            ${progressHTML}
+        </div>
+    `;
+};
+
+
+// ACHIEVEMENTS
+displayAchievements = function () {
+
+    const learner = getLoggedInLearner();
+
+    // Admin uses original achievement function
+    if (!learner) {
+        adminAchievementsFunction();
+        return;
+    }
+
+    const dropdown = document.getElementById("achievementLearner");
+    const button = document.getElementById("checkAchievements");
+    const results = document.getElementById("achievementResults");
+    const certificateArea = document.getElementById("certificateArea");
+
+    if (!results || !certificateArea) return;
+
+    // Hide Admin learner selector
+    if (dropdown) dropdown.style.display = "none";
+    if (button) button.style.display = "none";
+
+    results.replaceChildren();
+    certificateArea.classList.add("hidden");
+
+    const records = getMyAssessmentRecords();
+
+    if (records.length === 0) {
+        results.textContent =
+            "Complete your assessments to unlock your achievements.";
+        return;
+    }
+
+    const average = Math.round(
+        records.reduce(function (sum, record) {
+            return sum + Number(record.percentage || 0);
+        }, 0) / records.length
+    );
+
+    const achievements = [];
+
+    if (records.length >= 1) {
+        achievements.push("🌱 First Assessment Completed");
+    }
+
+    if (average >= 50) {
+        achievements.push("📚 Active Learner");
+    }
+
+    if (average >= 80) {
+        achievements.push("⭐ Learning Champion");
+    }
+
+    if (average === 100) {
+        achievements.push("🏆 Perfect Score");
+    }
+
+    achievements.forEach(function (achievement) {
+        const card = document.createElement("div");
+        card.className = "achievement-card";
+
+        const heading = document.createElement("h3");
+        heading.textContent = achievement;
+
+        card.appendChild(heading);
+        results.appendChild(card);
+    });
+
+    document.getElementById("certificateContent").innerHTML = `
+        <h1>LEARNING ACHIEVEMENT</h1>
+        <p>This achievement belongs to</p>
+        <h2>${escapeProfileText(learner.name)}</h2>
+        <p>Adult Literacy Program</p>
+        <h3>Average Assessment Score: ${average}%</h3>
+        <p>${achievements.map(escapeProfileText).join(", ")}</p>
+        <p>${new Date().toLocaleDateString("en-IN")}</p>
+    `;
+};
+// Learner Overview Register Button
+document.getElementById("learnerOverviewRegisterButton")
+    ?.addEventListener("click", function () {
+        showSection("registration");
+    });
+  
+
+
+// Personal Learning Progress for Learners
+const previousShowSectionForProgress = showSection;
+
+showSection = function(sectionId) {
+
+    previousShowSectionForProgress(sectionId);
+
+    const learner = getLoggedInLearner();
+
+    if (sectionId !== "learningProgress") return;
+
+    const progressSection = document.getElementById("learningProgress");
+    const progressForm = document.getElementById("progressForm");
+    const progressTable = document.getElementById("progressTable");
+
+    if (!progressSection) return;
+
+    // Admin view
+    if (!learner) {
+        if (progressForm) progressForm.style.display = "";
+        if (progressTable) progressTable.closest(".table-wrapper").style.display = "";
+        return;
+    }
+
+    // Hide Admin controls for learners
+    if (progressForm) progressForm.style.display = "none";
+
+    if (progressTable) {
+        progressTable.closest(".table-wrapper").style.display = "none";
+    }
+
+    let personalResults = document.getElementById("personalProgressResults");
+
+    if (!personalResults) {
+        personalResults = document.createElement("div");
+        personalResults.id = "personalProgressResults";
+        progressSection.appendChild(personalResults);
+    }
+
+    let assessments = [];
+
+    try {
+        assessments = JSON.parse(
+            localStorage.getItem("literacyLearnerAssessments")
+        ) || [];
+    } catch {
+        assessments = [];
+    }
+
+    const myResults = assessments.filter(function(record) {
+        return record.username === learner.username;
+    });
+
+    personalResults.innerHTML = `
+        <h2>My Learning Results</h2>
+        <p>These are your personal assessment results.</p>
+
+        ${
+            myResults.length === 0
+            ? "<p>No assessments completed yet.</p>"
+            : myResults.map(function(record) {
+                return `
+                    <div class="panel" style="margin-top:15px;">
+                        <h3>${escapeProfileText(record.subject || "Assessment")}</h3>
+                        <p>Score: ${escapeProfileText(String(record.score ?? 0))} / ${escapeProfileText(String(record.totalQuestions ?? 0))}</p>
+                        <p>Percentage: ${escapeProfileText(String(record.percentage ?? 0))}%</p>
+                        <p>Date: ${escapeProfileText(record.date || "-")}</p>
+                    </div>
+                `;
+            }).join("")
+        }
+    `;
+};
+// Learner Personal Profile
+const adminLoadProfileFunction = loadProfileLearners;
+
+loadProfileLearners = function() {
+
+    const learner = getLoggedInLearner();
+
+    // Admin keeps the original profile loader
+    if (!learner) {
+        adminLoadProfileFunction();
+        return;
+    }
+
+    const select = document.getElementById("profileLearnerSelect");
+    const button = document.getElementById("viewProfileBtn");
+    const details = document.getElementById("learnerProfileDetails");
+
+    if (select) select.style.display = "none";
+    if (button) button.style.display = "none";
+
+    if (!details) return;
+
+    let attendance = [];
+    let assessments = [];
+
+    try {
+        attendance = JSON.parse(localStorage.getItem("literacyAttendance")) || [];
+    } catch {
+        attendance = [];
+    }
+
+    try {
+        assessments = JSON.parse(localStorage.getItem("literacyLearnerAssessments")) || [];
+    } catch {
+        assessments = [];
+    }
+
+    if (!Array.isArray(attendance)) attendance = [];
+    if (!Array.isArray(assessments)) assessments = [];
+
+    const myAttendance = attendance.filter(record =>
+        record.username === learner.username
+    );
+
+    const myAssessments = assessments.filter(record =>
+        record.username === learner.username
+    );
+
+    details.innerHTML = `
+        <div class="panel">
+            <h3>My Personal Information</h3>
+            <p><strong>Name:</strong> ${escapeProfileText(learner.name || "-")}</p>
+            <p><strong>Username:</strong> ${escapeProfileText(learner.username || "-")}</p>
+            <p><strong>Email:</strong> ${escapeProfileText(learner.email || "-")}</p>
+        </div>
+
+        <div class="panel" style="margin-top:20px;">
+            <h3>My Attendance</h3>
+            <p>Total attendance records: ${myAttendance.length}</p>
+
+            ${
+                myAttendance.length === 0
+                ? "<p>No attendance records found.</p>"
+                : myAttendance.map(record => `
+                    <p>
+                        ${escapeProfileText(record.date || "-")} —
+                        ${escapeProfileText(record.status || "-")}
+                    </p>
+                `).join("")
+            }
+        </div>
+
+        <div class="panel" style="margin-top:20px;">
+            <h3>My Learning Progress</h3>
+
+            ${
+                myAssessments.length === 0
+                ? "<p>No assessments completed yet.</p>"
+                : myAssessments.map(record => `
+                    <p>
+                        <strong>${escapeProfileText(record.subject || "-")}</strong>:
+                        ${escapeProfileText(String(record.percentage ?? 0))}%
+                    </p>
+                `).join("")
+            }
+        </div>
+    `;
+};
+// Learner Personal Achievements
+const adminLoadAchievementsFunction = loadAchievementLearners;
+
+loadAchievementLearners = function() {
+
+    const learner = getLoggedInLearner();
+
+    // Admin keeps the original function
+    if (!learner) {
+        adminLoadAchievementsFunction();
+        return;
+    }
+
+    const dropdown = document.getElementById("achievementLearner");
+    const button = document.getElementById("checkAchievements");
+    const results = document.getElementById("achievementResults");
+
+    if (dropdown) dropdown.style.display = "none";
+    if (button) button.style.display = "none";
+
+    if (results) {
+        displayAchievements();
+    }
+};
+// Personal Smart Assistant View for Learners
+const adminLoadProgressLearnersFunction = loadProgressLearners;
+
+loadProgressLearners = function() {
+
+    const learner = getLoggedInLearner();
+
+    // Admin keeps the original loader
+    if (!learner) {
+        adminLoadProgressLearnersFunction();
+        return;
+    }
+
+    const dropdown = document.getElementById("progressLearner");
+    const progressForm = document.getElementById("progressForm");
+    const progressTable = document.getElementById("progressTable");
+
+    if (dropdown) dropdown.style.display = "none";
+    if (progressForm) progressForm.style.display = "none";
+
+    if (progressTable) {
+        const tableWrapper = progressTable.closest(".table-wrapper");
+        if (tableWrapper) tableWrapper.style.display = "none";
+    }
+
+    analyzeLearningProgress();
+};
+// Fix Start Assessment button on Learner Overview
+document.getElementById("overviewAssessmentButton")
+    ?.addEventListener("click", function () {
+
+        const dashboard = document.getElementById("dashboardPage");
+        const learnerPortal = document.getElementById("learnerPortal");
+        const startButton = document.getElementById("startLearnerAssessment");
+
+        dashboard.classList.add("hidden");
+        learnerPortal.classList.remove("hidden");
+
+        if (startButton) {
+            startButton.click();
+        }
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
